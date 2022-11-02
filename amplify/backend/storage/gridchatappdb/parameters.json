@@ -1,5 +1,0 @@
-{
-    "tableName": "gridchatappdb",
-    "partitionKeyName": "c",
-    "partitionKeyType": "S"
-}
