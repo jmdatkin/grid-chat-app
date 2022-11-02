@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-gridchatapp-dev-02344-authRole",
+      "UnauthRoleArn": "arn:aws:iam::004988645035:role/amplify-gridchatapp-dev-02344-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::004988645035:role/amplify-gridchatapp-dev-02344-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-gridchatapp-dev-02344-deployment",
+      "UnauthRoleName": "amplify-gridchatapp-dev-02344-unauthRole",
+      "StackName": "amplify-gridchatapp-dev-02344",
+      "StackId": "arn:aws:cloudformation:us-east-1:004988645035:stack/amplify-gridchatapp-dev-02344/d03f8180-58d3-11ed-94b3-0ec240785f9f",
+      "AmplifyAppId": "d22x1jce0jmcrd"
+    },
+    "categories": {
+      "auth": {
+        "gridchatapp12573c69": {}
+      },
+      "storage": {
+        "gridchatappdb": {}
+      }
+    }
+  }
+}
