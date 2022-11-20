@@ -1,38 +1,55 @@
+:root {
+  --toolbar-height: 75px;
+  --border-color: #555;
+  --toolbar-background: #fdfeff;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
 .App {
-  text-align: center;
+  /* text-align: center; */
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.AppWrapper {
   display: flex;
   flex-direction: column;
+  height: 100%;
+}
+
+.Toolbar {
+  width: 100%;
+  height: var(--toolbar-height);
+  border-bottom: solid 1px var(--border-color);
+  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  padding: 0.25rem 0.85rem;
+  background-color: var(--toolbar-background);
+  box-shadow: var(--shadow);
 }
 
-.App-link {
-  color: #61dafb;
+.Coords {
+  display: flex;
+  flex-direction: column;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.MainCanvasWrapper {
+  /* border: solid 1px #222; */
+  height: calc(100% - var(--toolbar-height));
+  position: relative;
+}
+
+.FloatingInputWrapper {
+  position: absolute;
+}
+
+.FloatingInput {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  background: transparent;
+  font-size: 14pt;
 }
