@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import Point2D from "../types/Point2D";
+import Point3D from "../types/Point3D";
 import Text from "../types/Text";
 import AppCanvas from "./AppCanvas";
 import FloatingInput from "./FloatingInput";
@@ -7,7 +8,7 @@ import FloatingInput from "./FloatingInput";
 type MainCanvasWrapperProps = {
     texts: Text[],
     inputPos: Point2D,
-    pos: Point2D,
+    pos: Point3D,
     setPos: Function,
     setInputPos: Function,
 };

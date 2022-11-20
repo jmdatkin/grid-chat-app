@@ -1,13 +1,15 @@
 import React, { ReactHTML, useEffect, useRef, useState } from "react";
-import { drawGrid, clear, drawText } from "../draw/draw";
+import { FONT_SIZE } from "../constants";
+import { drawGrid, clear, drawText, drawAdaptiveGrid } from "../draw/draw";
 import Point2D from "../types/Point2D";
+import Point3D from "../types/Point3D";
 import Text from "../types/Text";
 
 type AppCanvasProps = {
     texts: Text[],
     width: number,
     height: number
-    pos: Point2D,
+    pos: Point3D,
     setPos: Function,
     setInputPos: Function
 };
@@ -21,6 +23,9 @@ function AppCanvas(props: AppCanvasProps) {
     const canvasOffsetLeft = useRef(0);
     const canvasOffsetTop = useRef(0);
 
+    const lastScrollPosition = useRef(0);
+    const scrolling = useRef(false);
+
     // const [ctx, setCtx] = useState<null | CanvasRenderingContext2D>(null);
     const ctx = useRef<null | CanvasRenderingContext2D>(null);
 
@@ -32,13 +37,21 @@ function AppCanvas(props: AppCanvasProps) {
     const [initialMousedownLocation, setInitialMousedownLocation] = useState({ x: 0, y: 0 });
     const [initialMousedownPos, setInitialMousedownPos] = useState({ x: 0, y: 0 });
 
+    // const transform = function(x: number, y: number) {
+
+    // }
+
     const render = function () {
         if (ctx.current) {
             clear(ctx.current!, props.width, props.height);
             props.texts.forEach((text) => {
-                drawText(ctx.current!, text.content, text.x - props.pos.x, text.y - props.pos.y);
+                drawText(ctx.current!, text.content,
+                    (text.x - props.pos.x) / props.pos.z,
+                    (text.y - props.pos.y) / props.pos.z,
+                    FONT_SIZE / props.pos.z
+                    );
             });
-            drawGrid(ctx.current!, props.width, props.height, props.pos.x, props.pos.y, GRID_SIZE);
+            drawAdaptiveGrid(ctx.current!, props.width, props.height, props.pos.x/props.pos.z, props.pos.y/props.pos.z, props.pos.z, GRID_SIZE);
         }
     };
 
@@ -62,7 +75,8 @@ function AppCanvas(props: AppCanvasProps) {
         // setCtx(ctx);
 
 
-        drawGrid(ctx.current, props.width, props.height, props.pos.x, props.pos.y, GRID_SIZE);
+        // drawGrid(ctx.current, props.width, props.height, props.pos.x, props.pos.y, GRID_SIZE);
+        drawAdaptiveGrid(ctx.current, props.width, props.height, props.pos.x, props.pos.y, props.pos.z, GRID_SIZE);
     }, []);
 
     useEffect(() => {
@@ -132,7 +146,7 @@ function AppCanvas(props: AppCanvasProps) {
         let dy = qy - py;
 
         if (dragging) {
-            props.setPos({ x: ix - dx, y: iy - dy });
+            props.setPos({ x: ix - dx*props.pos.z, y: iy - dy*props.pos.z, z: props.pos.z });
             let canvas: HTMLCanvasElement = canvasRef.current!;
             canvas.style.cursor = 'grab';
             // console.log("HOO");
@@ -163,6 +177,36 @@ function AppCanvas(props: AppCanvasProps) {
     };
 
 
+    const onWheel = function (e: React.WheelEvent) {
+        let scaled = e.deltaY / 1000;
+
+        let {x,y,z} = props.pos;
+
+        let mouseX = e.pageX;
+        let mouseY = e.pageY;
+
+        let cx = mouseX * z + x;
+        let cy = mouseY * z + y;
+
+        let newZ = z + scaled * z;
+        newZ = Math.max(0.25, Math.min(newZ, 10));
+
+        let tx = -newZ / z * (cx - x) + cx;
+        let ty = -newZ / z * (cy - y) + cy;
+
+
+        // props.setPos({x: props.pos.x, y: props.pos.y, z: props.pos.z + scaled});
+        props.setPos({
+            // x: ((props.pos.x + mouseX)*newZ)-mouseX,
+            // y: ((props.pos.y + mouseY)*newZ)-mouseY,
+            // z: newZ
+            x: tx,
+            y: ty,
+            z: newZ
+        });
+    };
+
+
     return (
         <canvas ref={canvasRef}
             onMouseDown={onMouseDown}
@@ -172,6 +216,8 @@ function AppCanvas(props: AppCanvasProps) {
             onTouchStart={onMouseDown}
             onTouchMove={onMouseMove}
             onTouchEnd={onMouseUp}
+
+            onWheel={onWheel}
 
         ></canvas>
     );
