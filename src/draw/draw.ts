@@ -1,4 +1,5 @@
 import { FONT_FAMILY, FONT_SIZE } from "../constants";
+// import { filter } from "../services/profanity-filter";
 import Text from "../types/Text";
 
 const drawGrid = function (
@@ -86,16 +87,30 @@ const drawAdaptiveGrid = function (
 };
 
 const drawText = function (ctx: CanvasRenderingContext2D, content: string, x: number, y: number, size: number) {
-    // ctx.font = `${FONT_SIZE} ${FONT_FAMILY}`;
+    ctx.font = `${FONT_SIZE} ${FONT_FAMILY}`;
+
+    if (content === '') return;
+
+    let censor = true;
+
+    // try {
+    // content = censor ? filter.cleanHacked(content) : content;
+    // } catch(e) {
+    //     console.log(content);
+    //     return;
+    // }
+
     ctx.font = `${size}px ${FONT_FAMILY}`;
     ctx.fillStyle = "#000";
     ctx.textBaseline = "top";
     const metrics = ctx.measureText(content);
     const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+
+    
     ctx.fillText(
         content,
         x,
-        y + textHeight + 5
+        y// + textHeight + 5
         //14: 5
         //12: 4
         //24: 6

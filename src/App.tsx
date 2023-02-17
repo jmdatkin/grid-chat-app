@@ -1,6 +1,6 @@
 import './App.css';
 import AppWrapper from './components/AppWrapper';
-import MainCanvasWrapper from './components/MainCanvasWrapper';
+import MainCanvasWrapper from './components/CanvasWrapper';
 
 function App() {
   return (

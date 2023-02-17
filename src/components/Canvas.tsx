@@ -1,3 +1,4 @@
+import { CommonGestureState, FullGestureState, usePinch } from "@use-gesture/react";
 import React, { ReactHTML, useEffect, useRef, useState } from "react";
 import { FONT_SIZE } from "../constants";
 import { drawGrid, clear, drawText, drawAdaptiveGrid } from "../draw/draw";
@@ -5,7 +6,7 @@ import Point2D from "../types/Point2D";
 import Point3D from "../types/Point3D";
 import Text from "../types/Text";
 
-type AppCanvasProps = {
+type CanvasProps = {
     texts: Text[],
     width: number,
     height: number
@@ -16,7 +17,9 @@ type AppCanvasProps = {
 
 const GRID_SIZE = 75;
 
-function AppCanvas(props: AppCanvasProps) {
+const formatFloat = (f: number) => parseFloat(f.toFixed(2));
+
+function Canvas(props: CanvasProps) {
 
     const canvasRef = useRef(null);
 
@@ -26,20 +29,13 @@ function AppCanvas(props: AppCanvasProps) {
     const lastScrollPosition = useRef(0);
     const scrolling = useRef(false);
 
-    // const [ctx, setCtx] = useState<null | CanvasRenderingContext2D>(null);
     const ctx = useRef<null | CanvasRenderingContext2D>(null);
-
-    // const [pos, setPos] = useState({ x: 0, y: 0 });
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [dragging, setDragging] = useState(false);
 
     const [initialMousedownLocation, setInitialMousedownLocation] = useState({ x: 0, y: 0 });
     const [initialMousedownPos, setInitialMousedownPos] = useState({ x: 0, y: 0 });
-
-    // const transform = function(x: number, y: number) {
-
-    // }
 
     const render = function () {
         if (ctx.current) {
@@ -49,17 +45,62 @@ function AppCanvas(props: AppCanvasProps) {
                     (text.x - props.pos.x) / props.pos.z,
                     (text.y - props.pos.y) / props.pos.z,
                     FONT_SIZE / props.pos.z
-                    );
+                );
             });
-            drawAdaptiveGrid(ctx.current!, props.width, props.height, props.pos.x/props.pos.z, props.pos.y/props.pos.z, props.pos.z, GRID_SIZE);
+            drawAdaptiveGrid(ctx.current!, props.width, props.height, props.pos.x / props.pos.z, props.pos.y / props.pos.z, props.pos.z, GRID_SIZE);
         }
     };
 
+    const doZoom = function (zoom: number, mouseX: number, mouseY: number) {
+        let { x, y, z } = props.pos;
+
+        let cx = mouseX * z + x;
+        let cy = mouseY * z + y;
+
+        let newZ = z + zoom * z;
+        newZ = Math.max(0.25, Math.min(newZ, 10));
+
+        let tx = -newZ / z * (cx - x) + cx;
+        let ty = -newZ / z * (cy - y) + cy;
+
+        return { x: tx, y: ty, z: newZ };
+    };
+
+    const onPinch = function (state: any) {
+        let mouseX = state.origin[0];
+        let mouseY = state.origin[1];
+
+        let [mx, my] = state.movement;
+
+        // console.log(state.origin);
+        // (canvasRef.current! as HTMLCanvasElement).style.backgroundColor = "red";
+        let { x, y, z } = doZoom(
+            // mx**mx + my**my,
+            mx / 20,
+            mouseX,
+            mouseY
+        );
+
+        props.setPos({
+            x: formatFloat(x),
+            y: formatFloat(y),
+            z: formatFloat(z)
+        });
+    };
+
+    // Init
     useEffect(() => {
         const canvas: HTMLCanvasElement = canvasRef.current!;
 
-        canvas.width = props.width;
-        canvas.height = props.height;
+        canvas.style.width = `${props.width}px`;
+        canvas.style.height = `${props.height}px`;
+
+        const scale = window.devicePixelRatio;
+
+        // canvas.width = props.width;
+        // canvas.height = props.height;
+        canvas.width = Math.floor(props.width * scale);
+        canvas.height = Math.floor(props.height * scale);
 
         let bb = canvas.getBoundingClientRect();
 
@@ -72,18 +113,35 @@ function AppCanvas(props: AppCanvasProps) {
         const thisCtx: CanvasRenderingContext2D = canvas.getContext('2d')!;
         ctx.current = thisCtx;
 
-        // setCtx(ctx);
+        thisCtx.imageSmoothingEnabled = false;
 
+        ctx.current.scale(scale, scale);
 
-        // drawGrid(ctx.current, props.width, props.height, props.pos.x, props.pos.y, GRID_SIZE);
         drawAdaptiveGrid(ctx.current, props.width, props.height, props.pos.x, props.pos.y, props.pos.z, GRID_SIZE);
     }, []);
+
+    // usePinch(onPinch, {
+    //     target: canvasRef.current!,
+    //     preventDefault: true,
+    //     eventOptions: {
+    //         passive: false
+    //     }
+    // });
 
     useEffect(() => {
         const canvas: HTMLCanvasElement = canvasRef.current!;
 
-        canvas.width = props.width;
-        canvas.height = props.height;
+        canvas.style.width = `${props.width}px`;
+        canvas.style.height = `${props.height}px`;
+
+        const scale = window.devicePixelRatio;
+
+        // canvas.width = props.width;
+        // canvas.height = props.height;
+        canvas.width = Math.floor(props.width * scale);
+        canvas.height = Math.floor(props.height * scale);
+
+        ctx.current!.scale(scale, scale);
 
         let bb = canvas.getBoundingClientRect();
 
@@ -110,7 +168,9 @@ function AppCanvas(props: AppCanvasProps) {
     const onMouseDown = function (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) {
         let x = 0, y = 0;
         if (window.TouchEvent && e.nativeEvent instanceof TouchEvent) {
+            e.preventDefault();
             let touchEvent = e as React.TouchEvent;
+            if (touchEvent.touches.length >= 2) return;
             x = touchEvent.touches[0].pageX;
             y = touchEvent.touches[0].pageY;
         } else if (e.nativeEvent instanceof MouseEvent) {
@@ -132,7 +192,9 @@ function AppCanvas(props: AppCanvasProps) {
 
         let qx = 0, qy = 0;
         if (window.TouchEvent && e.nativeEvent instanceof TouchEvent) {
+            e.preventDefault();
             let touchEvent = e as React.TouchEvent;
+            if (touchEvent.touches.length >= 2) return;
             qx = touchEvent.touches[0].pageX;
             qy = touchEvent.touches[0].pageY;
         } else if (e.nativeEvent instanceof MouseEvent) {
@@ -146,10 +208,13 @@ function AppCanvas(props: AppCanvasProps) {
         let dy = qy - py;
 
         if (dragging) {
-            props.setPos({ x: ix - dx*props.pos.z, y: iy - dy*props.pos.z, z: props.pos.z });
+            props.setPos({  // Set world coords
+                x: formatFloat(ix - dx * props.pos.z),
+                y: formatFloat(iy - dy * props.pos.z),
+                z: formatFloat(props.pos.z)
+            });
             let canvas: HTMLCanvasElement = canvasRef.current!;
             canvas.style.cursor = 'grab';
-            // console.log("HOO");
         } else if (dx * dx + dy * dy > 81 && isMouseDown) {
             setDragging(true);
         }
@@ -158,7 +223,15 @@ function AppCanvas(props: AppCanvasProps) {
     const onMouseUp = function (e: React.MouseEvent | React.TouchEvent) {
         let x = 0, y = 0;
         if (window.TouchEvent && e.nativeEvent instanceof TouchEvent) {
+            e.preventDefault();
             let touchEvent = e as React.TouchEvent;
+            if (touchEvent.touches.length >= 2) {
+                let canvas: HTMLCanvasElement = canvasRef.current!;
+                canvas.style.cursor = 'inherit';
+                setIsMouseDown(false);
+                setDragging(false);
+                return;
+            };
             x = touchEvent.touches[0].pageX;
             y = touchEvent.touches[0].pageY;
         } else if (e.nativeEvent instanceof MouseEvent) {
@@ -180,19 +253,10 @@ function AppCanvas(props: AppCanvasProps) {
     const onWheel = function (e: React.WheelEvent) {
         let scaled = e.deltaY / 1000;
 
-        let {x,y,z} = props.pos;
-
         let mouseX = e.pageX;
         let mouseY = e.pageY;
 
-        let cx = mouseX * z + x;
-        let cy = mouseY * z + y;
-
-        let newZ = z + scaled * z;
-        newZ = Math.max(0.25, Math.min(newZ, 10));
-
-        let tx = -newZ / z * (cx - x) + cx;
-        let ty = -newZ / z * (cy - y) + cy;
+        let { x: tx, y: ty, z: newZ } = doZoom(scaled, mouseX, mouseY);
 
 
         // props.setPos({x: props.pos.x, y: props.pos.y, z: props.pos.z + scaled});
@@ -200,9 +264,9 @@ function AppCanvas(props: AppCanvasProps) {
             // x: ((props.pos.x + mouseX)*newZ)-mouseX,
             // y: ((props.pos.y + mouseY)*newZ)-mouseY,
             // z: newZ
-            x: tx,
-            y: ty,
-            z: newZ
+            x: formatFloat(tx),
+            y: formatFloat(ty),
+            z: formatFloat(newZ)
         });
     };
 
@@ -223,4 +287,4 @@ function AppCanvas(props: AppCanvasProps) {
     );
 }
 
-export default AppCanvas;
+export default Canvas;

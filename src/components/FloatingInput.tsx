@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FONT_FAMILY, FONT_SIZE } from "../constants";
 import { postText } from "../firebase";
+import { filter } from "../services/profanity-filter";
 import Point2D from "../types/Point2D";
 import Point3D from "../types/Point3D";
 
@@ -44,9 +45,9 @@ function FloatingInput(props: FloatingInputProps) {
     const onKeyPress = function(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key === 'Enter') {
             postText({
-                x: (props.pos.x + props.inputPos.x) * props.pos.z,
-                y: (props.pos.y + props.inputPos.y) * props.pos.z,
-                content: value
+                x: props.pos.x + props.inputPos.x*props.pos.z,
+                y: props.pos.y + props.inputPos.y*props.pos.z,
+                content: filter.clean(value)
             });
             e.currentTarget.blur();
         }

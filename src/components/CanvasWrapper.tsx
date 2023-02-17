@@ -1,11 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Point2D from "../types/Point2D";
 import Point3D from "../types/Point3D";
 import Text from "../types/Text";
-import AppCanvas from "./AppCanvas";
+import Canvas from "./Canvas";
 import FloatingInput from "./FloatingInput";
+import Spinner from "./Spinner";
 
-type MainCanvasWrapperProps = {
+type CanvasWrapperProps = {
+    textsLoaded: boolean,
     texts: Text[],
     inputPos: Point2D,
     pos: Point3D,
@@ -13,7 +15,7 @@ type MainCanvasWrapperProps = {
     setInputPos: Function,
 };
 
-function MainCanvasWrapper(props: MainCanvasWrapperProps) {
+function CanvasWrapper(props: CanvasWrapperProps) {
 
     const wrapperRef = useRef(null);
 
@@ -21,11 +23,11 @@ function MainCanvasWrapper(props: MainCanvasWrapperProps) {
     const height = useRef(900);
 
     useEffect(() => {
-        const resizeHandler = function() {
+        const resizeHandler = function () {
             let wrapper: HTMLElement = wrapperRef.current!;
 
             let bb = wrapper.getBoundingClientRect();
-            
+
             width.current = bb.width;
             height.current = bb.height;
         };
@@ -40,20 +42,20 @@ function MainCanvasWrapper(props: MainCanvasWrapperProps) {
     }, []);
 
     return (
-        <div ref={wrapperRef} className="MainCanvasWrapper">
+        <div ref={wrapperRef} className={`${props.textsLoaded ? 'loaded' : ''} MainCanvasWrapper`}>
             <FloatingInput
                 pos={props.pos}
                 inputPos={props.inputPos}></FloatingInput>
-            <AppCanvas
-            pos={props.pos}
-            setPos={props.setPos}
-            setInputPos={props.setInputPos}
-            width={width.current}
-            height={height.current}
-            texts={props.texts}
-            ></AppCanvas>
+            <Canvas
+                pos={props.pos}
+                setPos={props.setPos}
+                setInputPos={props.setInputPos}
+                width={width.current}
+                height={height.current}
+                texts={props.texts}
+            ></Canvas>
         </div>
     )
 }
 
-export default MainCanvasWrapper;
+export default CanvasWrapper;
