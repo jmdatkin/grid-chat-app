@@ -1,5 +1,5 @@
 import InputText from "./InputText";
-import '../styles/LoginForm.css';
+import {styles} from '@/styles/LoginForm.module.css';
 import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
 

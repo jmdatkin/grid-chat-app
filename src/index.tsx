@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import 'react-tooltip/dist/react-tooltip.css'
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
-import { App } from './App';
+import { App } from './pages';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 

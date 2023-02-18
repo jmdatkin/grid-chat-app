@@ -6,7 +6,6 @@ import Point3D from "../types/Point3D";
 import Text from "../types/Text";
 import CanvasWrapper from "./CanvasWrapper";
 import Toolbar from "./Toolbar";
-import { useLocation } from "react-router-dom";
 import Point2D from "../types/Point2D";
 import Sidebar from "./Sidebar";
 
@@ -24,7 +23,6 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     const [sidebarHidden, setSidebarHidden] = useState(true);
 
-    let location = useLocation();
 
     useEffect(() => {
         onFetchTexts((snapshot: DataSnapshot) => {
@@ -32,7 +30,6 @@ function AppWrapper(props: React.ComponentProps<any>) {
             setTexts([...textsArray, ...texts]);
             setTextsLoaded(true);
         });
-        console.log(location.pathname);
     }, []);
 
 

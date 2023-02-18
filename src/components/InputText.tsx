@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChangeEventHandler, useState } from "react";
-import '../styles/InputText.css';
+import {styles} from '@/styles/InputText.module.css';
 
 function InputText(props: any) {
 

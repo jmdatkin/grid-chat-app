@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import '../styles/IconButton.css';
+import {styles} from '@/styles/IconButton.module.css';
 
 function IconButton(props: any) {
     return (

@@ -1,8 +1,8 @@
 import IconButton from "./IconButton";
-import '../styles/Sidebar.css';
+import {styles} from '@/styles/Sidebar.module.css';
 import { faRightFromBracket, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";
-import { UserContext } from "../App";
+import { UserContext } from "../pages";
 import { Tooltip } from "react-tooltip";
 import LoginForm from "./LoginForm";
 

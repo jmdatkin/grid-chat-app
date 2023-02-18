@@ -1,9 +1,8 @@
 import { onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
 import { createContext, useState } from 'react';
-import './App.css';
-import AppWrapper from './components/AppWrapper';
-import MainCanvasWrapper from './components/CanvasWrapper';
-import { auth } from './firebase';
+import AppWrapper from '../components/AppWrapper';
+import MainCanvasWrapper from '../components/CanvasWrapper';
+import { auth } from '../firebase';
 
 const UserContext = createContext<User | null>(null);
 
