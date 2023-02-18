@@ -1,0 +1,28 @@
+import { useState } from "react";
+import '../styles/Tooltip.css';
+
+function Tooltip(props: any) {
+
+    const [visible, setVisible] = useState(false);
+
+    const mouseEnterHandler = function () {
+        setVisible(true);
+    };
+
+    const mouseLeaveHandler = function () {
+        setVisible(false);
+    };
+
+    return (
+        <>
+            <div className="TooltipWrapper" onMouseEnter={mouseEnterHandler} onMouseLeave={mouseLeaveHandler}>
+                <span className={`Tooltip ${visible ? 'TooltipVisible' : ''}`}>
+                    {props.text}
+                </span>
+                {props.children}
+            </div>
+        </>
+    );
+}
+
+export default Tooltip;

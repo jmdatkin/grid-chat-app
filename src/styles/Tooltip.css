@@ -1,0 +1,23 @@
+.TooltipWrapper {
+    position: relative;
+}
+
+.Tooltip {
+    position: absolute;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.8);
+    border: solid 1px #222;
+    color: white;
+    letter-spacing: -1px;
+    transition: opacity 0.5s ease;
+    left: 0;
+}
+
+.TooltipVisible {
+    visibility: visible;
+    opacity: 1;
+}

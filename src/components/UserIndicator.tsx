@@ -9,9 +9,15 @@ function UserIndicator(props: any) {
 
     const userString = `Signed in as ${user?.isAnonymous ? 'anonymous' : user?.displayName}`;
 
+    const clickHandler = function(e: Event) {
+        e.stopPropagation();
+        props.setSidebarHidden(false);
+    }
+
     return ( 
         <div className="UserIndicator">
-            <IconButton icon={faUser} clickHandler={() => props.setSidebarHidden(false)}>
+            {/* <IconButton icon={faUser} clickHandler={() => props.setSidebarHidden(false)}> */}
+            <IconButton icon={faUser} clickHandler={clickHandler}>
 
             </IconButton>
         </div>

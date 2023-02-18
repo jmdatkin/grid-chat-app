@@ -14,12 +14,17 @@
 
 .icon-button:hover {
     background-color: #f2f2f2;
+    color: #222 !important;
 }
 
 .icon-button:active {
     background-color: #dbdbdb;
 }
 
-.icon-button > svg {
+.icon-button div {
+    display: flex;
+}
+
+.icon-button svg {
     font-size: 14pt;
 }

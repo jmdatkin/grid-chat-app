@@ -3,7 +3,7 @@ import '../styles/IconButton.css';
 
 function IconButton(props: any) {
     return (
-        <button className="icon-button" onClick={props.clickHandler}>
+        <button style={props.style} className="icon-button" onClick={props.clickHandler}>
             <FontAwesomeIcon icon={props.icon}></FontAwesomeIcon>
         </button>
     );

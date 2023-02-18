@@ -1,0 +1,8 @@
+.LoginForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.LoginForm > *:not(:last-child) {
+    margin-bottom: 10px;
+}

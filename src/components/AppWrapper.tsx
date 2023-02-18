@@ -38,7 +38,7 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     return (
         <div className="AppWrapper">
-            <div className="AppLayer">
+            <div className="AppLayer" onClick={() => setSidebarHidden(true)}>
                 <Sidebar sidebarHidden={sidebarHidden} setSidebarHidden={setSidebarHidden}></Sidebar>
                 <Toolbar
                     pos={pos}
