@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { connect, onFetchTexts, postText } from "./services/firebase-firestore";
 import Text from "./types/Text";
@@ -27,8 +28,16 @@ const analytics = getAnalytics(app);
 
 const db = connect(app);
 
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+
+  }
+})
+
 const postTextToDb = (text: Text) => postText(db,text);
 
 const fetchTextsFromDb = (cb: (snapshot: DataSnapshot) => void) => onFetchTexts(db, cb)
 
-export { postTextToDb as postText, fetchTextsFromDb as onFetchTexts };
+export { postTextToDb as postText, fetchTextsFromDb as onFetchTexts, auth };

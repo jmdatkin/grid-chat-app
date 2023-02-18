@@ -19,8 +19,8 @@ function CanvasWrapper(props: CanvasWrapperProps) {
 
     const wrapperRef = useRef(null);
 
-    const width = useRef(1600);
-    const height = useRef(900);
+    const [width, setWidth] = useState(1600);
+    const [height, setHeight] = useState(900);
 
     useEffect(() => {
         const resizeHandler = function () {
@@ -28,8 +28,8 @@ function CanvasWrapper(props: CanvasWrapperProps) {
 
             let bb = wrapper.getBoundingClientRect();
 
-            width.current = bb.width;
-            height.current = bb.height;
+            setWidth(bb.width);
+            setHeight(bb.height);
         };
 
         resizeHandler();
@@ -50,8 +50,8 @@ function CanvasWrapper(props: CanvasWrapperProps) {
                 pos={props.pos}
                 setPos={props.setPos}
                 setInputPos={props.setInputPos}
-                width={width.current}
-                height={height.current}
+                width={width}
+                height={height}
                 texts={props.texts}
             ></Canvas>
         </div>

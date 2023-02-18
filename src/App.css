@@ -6,6 +6,10 @@
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .App {
   /* text-align: center; */
   height: 100vh;
@@ -37,7 +41,10 @@
   position: fixed;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0.25rem 0.85rem;
+  box-sizing: border-box;
+  z-index: 900;
   /* background-color: var(--toolbar-background); */
   /* box-shadow: var(--shadow); */
 }
@@ -70,7 +77,7 @@
 }
 
 .FloatingInputWrapper {
-  position: absolute;
+  position: fixed;
 }
 
 .FloatingInput {

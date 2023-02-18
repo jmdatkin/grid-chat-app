@@ -8,6 +8,7 @@ import CanvasWrapper from "./CanvasWrapper";
 import Toolbar from "./Toolbar";
 import { useLocation } from "react-router-dom";
 import Point2D from "../types/Point2D";
+import Sidebar from "./Sidebar";
 
 type AppWrapperProps = {
 
@@ -20,6 +21,8 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     const [texts, setTexts] = useState<Text[]>([]);
     const [textsLoaded, setTextsLoaded] = useState<boolean>(false);
+
+    const [sidebarHidden, setSidebarHidden] = useState(true);
 
     let location = useLocation();
 
@@ -36,10 +39,11 @@ function AppWrapper(props: React.ComponentProps<any>) {
     return (
         <div className="AppWrapper">
             <div className="AppLayer">
-                <span>{props.location}</span>
+                <Sidebar sidebarHidden={sidebarHidden} setSidebarHidden={setSidebarHidden}></Sidebar>
                 <Toolbar
                     pos={pos}
                     setPos={setPos}
+                    setSidebarHidden={setSidebarHidden}
                 ></Toolbar>
                 <CanvasWrapper
                     textsLoaded={textsLoaded}
