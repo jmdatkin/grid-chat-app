@@ -5,10 +5,20 @@ import { useContext } from "react";
 import { UserContext } from "../App";
 import { Tooltip } from "react-tooltip";
 import LoginForm from "./LoginForm";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
 
 type SidebarProps = {
     sidebarHidden: boolean,
-    setSidebarHidden: Function
+    setSidebarHidden: Function,
+    setUser: Function
+};
+
+const signOutHandler = function() {
+    console.log('HILSADJ')
+    signOut(auth)
+    .then(() => window.location.href = window.location.href)
+    .catch(() => console.log("Error"));
 };
 
 const onClickHandler = function(e: any) {
@@ -29,16 +39,16 @@ function Sidebar(props: SidebarProps) {
                     <div>
                         <IconButton label="Testing" style={{ color: 'white' }} icon={faTimes} clickHandler={() => props.setSidebarHidden(true)}>
                         </IconButton>
-                        <IconButton style={{ color: 'white' }} icon={faRightFromBracket}></IconButton>
+                        <IconButton style={{ color: 'white' }} icon={faRightFromBracket} clickHandler={signOutHandler}></IconButton>
                     </div>
                 </div>
                 <div className="SidebarInfo">
                     <span className="SidebarTitle">Grid Chat</span>
-                    <span>Signed in as: <strong>{user?.isAnonymous ? 'anonymous' : user?.displayName}</strong></span>
+                    <span>Signed in as: <strong>{user?.isAnonymous ? 'anonymous' : user?.email}</strong></span>
                 </div>
             </div>
             <div className="SidebarSectionBody">
-                <LoginForm></LoginForm>
+                <LoginForm setUser={props.setUser}></LoginForm>
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 import { onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import './App.css';
 import AppWrapper from './components/AppWrapper';
 import MainCanvasWrapper from './components/CanvasWrapper';
@@ -11,28 +11,31 @@ function App() {
 
   const [user, setUser] = useState<User | null>(null);
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      setUser(user);
-    }
-  });
-
-  signInAnonymously(auth)
-    .then(() => {
-      // Signed in..
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(error);
-      // ...
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      }
     });
+
+    // signInAnonymously(auth)
+    //   .then(() => {
+    //     // Signed in..
+    //   })
+    //   .catch((error) => {
+    //     const errorCode = error.code;
+    //     const errorMessage = error.message;
+    //     console.log(error);
+    //     // ...
+    //   });
+
+  }, []);
 
   return (
     <UserContext.Provider value={user}>
       <div className="App">
         {/* <MainCanvasWrapper></MainCanvasWrapper>  */}
-        <AppWrapper></AppWrapper>
+        <AppWrapper setUser={setUser}></AppWrapper>
       </div>
     </UserContext.Provider>
   );

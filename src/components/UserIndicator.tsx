@@ -7,7 +7,7 @@ function UserIndicator(props: any) {
 
     const user = useContext(UserContext)
 
-    const userString = `Signed in as ${user?.isAnonymous ? 'anonymous' : user?.displayName}`;
+    const userString = `Signed in as ${user?.isAnonymous ? 'anonymous' : user?.email}`;
 
     const clickHandler = function(e: Event) {
         e.stopPropagation();

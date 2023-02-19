@@ -50,6 +50,7 @@
     ]
   },
   "devDependencies": {
-    "@types/bad-words": "^3.0.1"
+    "@types/bad-words": "^3.0.1",
+    "tailwindcss": "^3.2.7"
   }
 }
