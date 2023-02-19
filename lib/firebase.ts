@@ -2,9 +2,9 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
-import { connect, onFetchTexts, postText } from "./services/firebase-firestore";
-import Text from "./types/Text";
-import { DataSnapshot } from "firebase/database";
+import { connect, onFetchTexts, postText } from "../src/services/firebase-firestore";
+import Text from "../src/types/Text";
+import { Database, DataSnapshot } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -22,6 +22,14 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+
+// let postTextToDb = null;
+// let fetchTextsFromDb = null;
+// let auth = null;
+
+// if (typeof window !== 'undefined') {
+
+const initFirebase = function() {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
@@ -29,16 +37,12 @@ const db = connect(app);
 
 const auth = getAuth(app);
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-
-  }
-})
-
-const postTextToDb = (text: Text) => postText(db, text);
-
-const fetchTextsFromDb = (cb: (snapshot: DataSnapshot) => void) => onFetchTexts(db, cb)
-
+return {app,db,auth};
 }
 
-export { postTextToDb as postText, fetchTextsFromDb as onFetchTexts, auth };
+const postTextToDb = (db: Database, text: Text) => postText(db, text);
+
+const fetchTextsFromDb = (db: Database, cb: (snapshot: DataSnapshot) => void) => onFetchTexts(db, cb);
+// }
+
+export { postTextToDb as postText, fetchTextsFromDb as onFetchTexts, initFirebase};

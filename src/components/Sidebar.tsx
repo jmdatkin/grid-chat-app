@@ -2,9 +2,9 @@ import IconButton from "./IconButton";
 import {styles} from '@/styles/Sidebar.module.css';
 import { faRightFromBracket, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";
-import { UserContext } from "../pages";
 import { Tooltip } from "react-tooltip";
 import LoginForm from "./LoginForm";
+import UserContext from "@/context/UserContext";
 
 type SidebarProps = {
     sidebarHidden: boolean,

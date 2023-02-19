@@ -1,6 +1,6 @@
+import UserContext from "@/context/UserContext";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";
-import { UserContext } from "../pages";
 import IconButton from "./IconButton";
 
 function UserIndicator(props: any) {

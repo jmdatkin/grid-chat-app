@@ -1,31 +1,35 @@
 import { onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import AppWrapper from '../components/AppWrapper';
 import MainCanvasWrapper from '../components/CanvasWrapper';
-import { auth } from '../firebase';
-
-const UserContext = createContext<User | null>(null);
+import { auth, initFirebase } from '../../lib/firebase';
+import UserContext from '@/context/UserContext';
 
 function App() {
 
   const [user, setUser] = useState<User | null>(null);
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      setUser(user);
-    }
-  });
+  useEffect(() => {
+    const {auth} = initFirebase();
 
-  signInAnonymously(auth)
-    .then(() => {
-      // Signed in..
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(error);
-      // ...
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      }
     });
+
+    signInAnonymously(auth)
+      .then(() => {
+        // Signed in..
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(error);
+        // ...
+      });
+
+  }, []);
 
   return (
     <UserContext.Provider value={user}>
@@ -37,4 +41,4 @@ function App() {
   );
 }
 
-export { App, UserContext };
+export default App;

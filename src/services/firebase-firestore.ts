@@ -1,7 +1,6 @@
 import { FirebaseApp } from "firebase/app";
 import { Database, DataSnapshot, get, getDatabase, onValue, push, ref, set } from "firebase/database";
 import { toast } from "react-toastify";
-import { REPL_MODE_SLOPPY } from "repl";
 import Text from "../types/Text";
 
 let database: Database | null = null;

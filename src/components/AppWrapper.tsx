@@ -1,6 +1,6 @@
 import { DataSnapshot } from "firebase/database";
 import React, { useEffect, useState } from "react";
-import { onFetchTexts } from "../firebase";
+import { onFetchTexts } from "../../lib/firebase";
 import { ToastContainer, Zoom } from "react-toastify";
 import Point3D from "../types/Point3D";
 import Text from "../types/Text";
