@@ -21,10 +21,10 @@ function LoginForm(props: any) {
             .catch(error => {
                 if (error.code === AuthErrorCodes.EMAIL_EXISTS) {
                     signInWithEmailAndPassword(auth, username, password)
-                    .catch(console.log)
-                        // .then(userCredential => {
-                        //     props.setUser(userCredential.user);
-                        // });
+                        .catch(console.log)
+                    // .then(userCredential => {
+                    //     props.setUser(userCredential.user);
+                    // });
                 } else {
                     console.log(error.code, error.message);
                 }
@@ -33,12 +33,12 @@ function LoginForm(props: any) {
 
 
     return (
-        <div className="LoginForm">
+        <div>
             <strong>Sign In</strong>
             <form className="space-y-2">
-            <InputText icon={faUser} placeholder="Email" handleChange={(e: any) => setUsername(e.target.value)}></InputText>
-            <InputText icon={faKey} placeholder="Password" handleChange={(e: any) => setPassword(e.target.value)} password></InputText>
-            <Button label="Sign In" handleClick={signInAction}></Button>
+                <InputText icon={faUser} placeholder="Email" handleChange={(e: any) => setUsername(e.target.value)}></InputText>
+                <InputText icon={faKey} placeholder="Password" handleChange={(e: any) => setPassword(e.target.value)} password></InputText>
+                <Button label="Sign In" handleClick={signInAction}></Button>
             </form>
         </div>
     );

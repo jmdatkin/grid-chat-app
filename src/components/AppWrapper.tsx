@@ -1,5 +1,5 @@
 import { DataSnapshot } from "firebase/database";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { onFetchTexts } from "../firebase";
 import { ToastContainer, Zoom } from "react-toastify";
 import Point3D from "../types/Point3D";
@@ -11,6 +11,7 @@ import Point2D from "../types/Point2D";
 import Sidebar from "./Sidebar";
 import Modal from "./Modal";
 import ModalLoginForm from "./ModalLoginForm";
+import { UserContext } from "../App";
 
 type AppWrapperProps = {
 
@@ -25,6 +26,8 @@ function AppWrapper(props: React.ComponentProps<any>) {
     const [textsLoaded, setTextsLoaded] = useState<boolean>(false);
 
     const [sidebarHidden, setSidebarHidden] = useState(true);
+
+    const user = useContext(UserContext);
 
     let location = useLocation();
 
@@ -56,9 +59,12 @@ function AppWrapper(props: React.ComponentProps<any>) {
                     texts={texts}
                 ></CanvasWrapper>
             </div>
-            <Modal>
-                <ModalLoginForm></ModalLoginForm>
-            </Modal>
+            {
+                user === null ?
+                    <Modal>
+                        <ModalLoginForm></ModalLoginForm>
+                    </Modal> : <></>
+            }
             <ToastContainer
                 position="top-right"
                 theme="colored"

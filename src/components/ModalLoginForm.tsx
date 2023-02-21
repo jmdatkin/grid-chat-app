@@ -8,6 +8,8 @@ import '../styles/FadeAnimation.css';
 import InputText from "./InputText";
 import { CSSTransition } from 'react-transition-group';
 import LoginMethod from "../types/LoginMethod";
+import LoginMethods from "./LoginMethods";
+import EmailLoginForm from "./EmailLoginForm";
 
 
 function ModalLoginForm(props: any) {
@@ -23,34 +25,20 @@ function ModalLoginForm(props: any) {
 
     useEffect(() => {
         switch (loginMethod) {
-            case null:
-                setLoginComponent((
-                    <div ref={loginComponentEl} className="p-24 w-full flex flex-col items-center space-y-2">
-                        <LoginMethodButton clickHandler={() => { setLoginMethod(LoginMethod.GUEST); login(); }} icon={<FontAwesomeIcon className="w-full h-full text-gray-300" icon={faUser}></FontAwesomeIcon>}>
-                            Guest
-                        </LoginMethodButton>
-                        <LoginMethodButton clickHandler={() => { setLoginMethod(LoginMethod.EMAIL); login(); }} icon={<FontAwesomeIcon className="w-full h-full text-gray-600" icon={faEnvelope}></FontAwesomeIcon>}>
-                            Email and Password
-                        </LoginMethodButton>
-                        <LoginMethodButton clickHandler={() => { setLoginMethod(LoginMethod.GOOGLE); login(); }} icon={<img className="w-full h-full" src='google.svg' />}>
-                            Google Account
-                        </LoginMethodButton>
-                    </div>
-                ));
+            case LoginMethod.EMAIL:
+                setLoginComponent(<EmailLoginForm setLoginMethod={setLoginMethod} login={login}></EmailLoginForm>);
                 break;
 
-            case LoginMethod.EMAIL:
-                setInProp(true);
-                setLoginComponent((
-                    <div ref={loginComponentEl} className="p-24 w-full flex flex-col items-center space-y-2">
-                        <InputText></InputText>
-                        <InputText></InputText>
-                    </div>
-                ));
+            case LoginMethod.GOOGLE:
+                login();
+                break;
+
+            case LoginMethod.GUEST:
+                login();
                 break;
 
             default:
-                setLoginComponent((<div></div>));
+                setLoginComponent(<LoginMethods setLoginMethod={setLoginMethod}></LoginMethods>);
 
         }
     }, [loginMethod])
@@ -68,6 +56,7 @@ function ModalLoginForm(props: any) {
             case LoginMethod.EMAIL:
                 signInWithEmailAndPassword(auth, params.email, params.password)
                     .catch((error: AuthError) => {
+                        console.log(error);
                         setErrorCode(error.code);
                         setErrorMessage(error.message);
                         console.error(errorCode, errorMessage);
@@ -90,20 +79,8 @@ function ModalLoginForm(props: any) {
             <div className="bg-zinc-800 flex flex-col justify-around items-center">
                 <span className="text-white text-4xl font-semibold">Grid Chat</span>
             </div>
-            <div className="flex flex-col justify-around items-center">
-                <div className="p-2 md:p-8 lg:p-12 w-full flex flex-col items-center space-y-2">
-                    <LoginMethodButton clickHandler={() => { setLoginMethod(LoginMethod.GUEST); login(); }} icon={<FontAwesomeIcon className="w-full h-full text-gray-300" icon={faUser}></FontAwesomeIcon>}>
-                        Guest
-                    </LoginMethodButton>
-                    <LoginMethodButton clickHandler={() => { setLoginMethod(LoginMethod.EMAIL); login(); }} icon={<FontAwesomeIcon className="w-full h-full text-gray-600" icon={faEnvelope}></FontAwesomeIcon>}>
-                        Email and Password
-                    </LoginMethodButton>
-                    <LoginMethodButton clickHandler={() => { setLoginMethod(LoginMethod.GOOGLE); login(); }} icon={<img className="w-full h-full" src='google.svg' />}>
-                        Google Account
-                    </LoginMethodButton>
-                </div>
-                {/* <CSSTransition nodeRef={loginComponentEl} in={inProp} classNames="fade"> */}
-                {/* </CSSTransition> */}
+            <div className="flex flex-col justify-around items-center relative h-full">
+                {loginComponent}
             </div>
         </div>
     );
