@@ -9,6 +9,8 @@ import Toolbar from "./Toolbar";
 import { useLocation } from "react-router-dom";
 import Point2D from "../types/Point2D";
 import Sidebar from "./Sidebar";
+import Modal from "./Modal";
+import ModalLoginForm from "./ModalLoginForm";
 
 type AppWrapperProps = {
 
@@ -53,8 +55,10 @@ function AppWrapper(props: React.ComponentProps<any>) {
                     setInputPos={setInputPos}
                     texts={texts}
                 ></CanvasWrapper>
-
             </div>
+            <Modal>
+                <ModalLoginForm></ModalLoginForm>
+            </Modal>
             <ToastContainer
                 position="top-right"
                 theme="colored"

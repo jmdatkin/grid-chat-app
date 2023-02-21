@@ -35,9 +35,11 @@ function LoginForm(props: any) {
     return (
         <div className="LoginForm">
             <strong>Sign In</strong>
+            <form className="space-y-2">
             <InputText icon={faUser} placeholder="Email" handleChange={(e: any) => setUsername(e.target.value)}></InputText>
             <InputText icon={faKey} placeholder="Password" handleChange={(e: any) => setPassword(e.target.value)} password></InputText>
             <Button label="Sign In" handleClick={signInAction}></Button>
+            </form>
         </div>
     );
 }
