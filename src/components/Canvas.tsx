@@ -37,17 +37,24 @@ function Canvas(props: CanvasProps) {
     const [initialMousedownLocation, setInitialMousedownLocation] = useState({ x: 0, y: 0 });
     const [initialMousedownPos, setInitialMousedownPos] = useState({ x: 0, y: 0 });
 
+    const offsetPosX = () => props.pos.x - props.width / 2;
+    const offsetPosY = () => props.pos.y - props.height / 2;
+
     const render = function () {
         if (ctx.current) {
+            ctx.current.translate(-0.5, -0.5);
             clear(ctx.current!, props.width, props.height);
             props.texts.forEach((text) => {
                 drawText(ctx.current!, text.content,
+                    // (text.x - props.pos.x) / props.pos.z,
+                    // (text.y - props.pos.y) / props.pos.z,
                     (text.x - props.pos.x) / props.pos.z,
                     (text.y - props.pos.y) / props.pos.z,
                     FONT_SIZE / props.pos.z
                 );
             });
             drawAdaptiveGrid(ctx.current!, props.width, props.height, props.pos.x / props.pos.z, props.pos.y / props.pos.z, props.pos.z, GRID_SIZE);
+            ctx.current.translate(0.5, 0.5);
         }
     };
 
@@ -115,9 +122,15 @@ function Canvas(props: CanvasProps) {
 
         thisCtx.imageSmoothingEnabled = false;
 
-        ctx.current.scale(scale, scale);
+        // ctx.current.scale(scale, scale);
 
-        drawAdaptiveGrid(ctx.current, props.width, props.height, props.pos.x, props.pos.y, props.pos.z, GRID_SIZE);
+        // props.setPos({
+        //     x: props.pos.x - props.width/2,
+        //     y: props.pos.y - props.height/2,
+        //     z: props.pos.z
+        // });
+
+        // drawAdaptiveGrid(ctx.current, props.width, props.height, x, y, props.pos.z, GRID_SIZE);
     }, []);
 
     // usePinch(onPinch, {
@@ -209,6 +222,8 @@ function Canvas(props: CanvasProps) {
 
         if (dragging) {
             props.setPos({  // Set world coords
+                // x: formatFloat(ix - dx * props.pos.z),
+                // y: formatFloat(iy - dy * props.pos.z),
                 x: formatFloat(ix - dx * props.pos.z),
                 y: formatFloat(iy - dy * props.pos.z),
                 z: formatFloat(props.pos.z)

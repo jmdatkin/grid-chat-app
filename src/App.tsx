@@ -1,5 +1,6 @@
 import { onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
 import { createContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import './App.css';
 import AppWrapper from './components/AppWrapper';
 import MainCanvasWrapper from './components/CanvasWrapper';
@@ -15,6 +16,10 @@ function App() {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
+        if (localStorage.getItem('grid-chat.credentials-stored') !== 'true') toast("Successfully logged in!");
+        localStorage.setItem('grid-chat.credentials-stored', 'true');
+      } else {
+        localStorage.setItem('grid-chat.credentials-stored', 'false');
       }
     });
 

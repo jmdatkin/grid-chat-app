@@ -1,0 +1,7 @@
+.Tagline {
+    opacity: 0;
+}
+
+.active {
+    opacity: 1;
+}

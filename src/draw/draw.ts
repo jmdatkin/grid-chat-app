@@ -12,7 +12,8 @@ const drawGrid = function (
 ) {
     // ctx.strokeStyle = "rgba(0,0,0,0.3)";
     ctx.strokeStyle = color;
-    ctx.lineWidth = 0.5;
+    // ctx.lineWidth = 0.5;
+    ctx.lineWidth = 1
 
     let startX = - (x % size);
     let startY = - (y % size);
@@ -52,7 +53,7 @@ const drawGrid = function (
     // ctx.stroke();
 };
 
-const scaleAlpha = (z: number, c: number) => 0.15 * ((c - z) / c);
+const scaleAlpha = (z: number, c: number) => 0.08 * ((c - z) / c);
 
 const drawAdaptiveGrid = function (
     ctx: CanvasRenderingContext2D,

@@ -22,19 +22,11 @@ function Coords(props: CoordsProps) {
     };
 
     return (
-        <div className="Coords">
-            {/* <span>
-                x: <EditableSpan setParentValue={updateX} value={props.coords.x+''} />
-            </span>
-            <span>
-                y: <EditableSpan setParentValue={updateY} value={props.coords.y+''} />
-            </span>
-            <span>
-                z: <EditableSpan setParentValue={updateZ} value={props.coords.z+''} />
-            </span> */}
-            <span>x: {props.coords.x}</span>
+        <div className="space-x-4">
+            {/* <span>x: {props.coords.x}</span>
             <span>y: {props.coords.y}</span>
-            <span>z: {props.coords.z}</span>
+            <span>z: {props.coords.z}</span> */}
+            <span>{`(${props.coords.x}, ${props.coords.y}, ${props.coords.z})`}</span>
         </div>
     );   
 }

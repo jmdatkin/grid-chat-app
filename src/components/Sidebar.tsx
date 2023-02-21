@@ -30,7 +30,7 @@ function Sidebar(props: SidebarProps) {
     const user = useContext(UserContext);
 
     return (
-        <div onClick={onClickHandler} className={`Sidebar ${props.sidebarHidden ? 'hidden' : ''}`}>
+        <div onClick={onClickHandler} className={`Sidebar ${props.sidebarHidden ? 'Sidebar-hidden' : ''}`}>
             <div className="SidebarSectionHeader">
                 <div className="SidebarHeader">
                     <div>
@@ -48,7 +48,6 @@ function Sidebar(props: SidebarProps) {
                 </div>
             </div>
             <div className="SidebarSectionBody">
-                <LoginForm setUser={props.setUser}></LoginForm>
             </div>
         </div>
     );

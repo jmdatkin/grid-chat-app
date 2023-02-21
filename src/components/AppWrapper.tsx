@@ -1,5 +1,5 @@
 import { DataSnapshot } from "firebase/database";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { onFetchTexts } from "../firebase";
 import { ToastContainer, Zoom } from "react-toastify";
 import Point3D from "../types/Point3D";
@@ -12,6 +12,9 @@ import Sidebar from "./Sidebar";
 import Modal from "./Modal";
 import ModalLoginForm from "./ModalLoginForm";
 import { UserContext } from "../App";
+import { CSSTransition } from "react-transition-group";
+import '../styles/FadeAnimation.css';
+import Spinner from "./Spinner";
 
 type AppWrapperProps = {
 
@@ -27,6 +30,8 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     const [sidebarHidden, setSidebarHidden] = useState(true);
 
+    const modalRef = useRef(null);
+
     const user = useContext(UserContext);
 
     let location = useLocation();
@@ -40,6 +45,13 @@ function AppWrapper(props: React.ComponentProps<any>) {
         console.log(location.pathname);
     }, []);
 
+    const loginStage = function() {
+        if (localStorage.getItem('grid-chat.credentials-stored') === 'true' && user === null) {
+            return <Spinner></Spinner>
+        } else if (user === null) {
+            return <ModalLoginForm></ModalLoginForm>
+        } else return (<></>);
+    }
 
     return (
         <div className="AppWrapper">
@@ -61,9 +73,13 @@ function AppWrapper(props: React.ComponentProps<any>) {
             </div>
             {
                 user === null ?
-                    <Modal>
-                        <ModalLoginForm></ModalLoginForm>
-                    </Modal> : <></>
+                    <CSSTransition nodeRef={modalRef} in={user === null} timeout={200} classNames="fade">
+                        <Modal ref={modalRef}>
+                            {/* <ModalLoginForm></ModalLoginForm> */}
+                            {loginStage()}
+                        </Modal>
+                    </CSSTransition>
+                    : <></>
             }
             <ToastContainer
                 position="top-right"

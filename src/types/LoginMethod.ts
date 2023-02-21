@@ -1,6 +1,7 @@
 enum LoginMethod {
     GUEST,
     EMAIL,
+    REGISTER,
     GOOGLE
 };
 
