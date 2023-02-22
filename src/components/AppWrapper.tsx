@@ -15,6 +15,7 @@ import { UserContext } from "../App";
 import { CSSTransition } from "react-transition-group";
 import '../styles/FadeAnimation.css';
 import Spinner from "./Spinner";
+import { ClipLoader } from "react-spinners";
 
 type AppWrapperProps = {
 
@@ -74,7 +75,10 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     const loginStage = function () {
         if (localStorage.getItem('grid-chat.credentials-stored') === 'true' && user === null) {
-            return <Spinner></Spinner>
+            return (<div className="w-full h-full flex flex-col justify-around items-center">
+                {/* <Spinner></Spinner> */}
+                <ClipLoader color="rgb(209 213 219)"></ClipLoader>
+            </div>)
         } else if (user === null) {
             return <ModalLoginForm></ModalLoginForm>
         } else return (<></>);
