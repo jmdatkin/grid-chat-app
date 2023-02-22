@@ -55,6 +55,8 @@ function Canvas(props: CanvasProps) {
             });
             drawAdaptiveGrid(ctx.current!, props.width, props.height, props.pos.x / props.pos.z, props.pos.y / props.pos.z, props.pos.z, GRID_SIZE);
             ctx.current.translate(0.5, 0.5);
+            // console.log("EEE");
+            // ctx.current.fillRect(0,0,500,500);
         }
     };
 
@@ -130,7 +132,7 @@ function Canvas(props: CanvasProps) {
         //     z: props.pos.z
         // });
 
-        // drawAdaptiveGrid(ctx.current, props.width, props.height, x, y, props.pos.z, GRID_SIZE);
+        // drawAdaptiveGrid(ctx.current, props.width, props.height, props.pos.x, props.pos.y, props.pos.z, GRID_SIZE);
     }, []);
 
     // usePinch(onPinch, {

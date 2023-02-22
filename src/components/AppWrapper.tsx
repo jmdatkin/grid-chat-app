@@ -1,6 +1,6 @@
 import { DataSnapshot } from "firebase/database";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { onFetchTexts } from "../firebase";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import { onFetchTexts, onFetchTextsFromRoom } from "../firebase";
 import { ToastContainer, Zoom } from "react-toastify";
 import Point3D from "../types/Point3D";
 import Text from "../types/Text";
@@ -23,6 +23,9 @@ type AppWrapperProps = {
 function AppWrapper(props: React.ComponentProps<any>) {
 
     const [pos, setPos] = useState<Point3D>({ x: 0, y: 0, z: 1 });
+
+    const getPos = () => pos;
+
     const [inputPos, setInputPos] = useState<Point2D>({ x: 0, y: 0 });
 
     const [texts, setTexts] = useState<Text[]>([]);
@@ -37,15 +40,39 @@ function AppWrapper(props: React.ComponentProps<any>) {
     let location = useLocation();
 
     useEffect(() => {
-        onFetchTexts((snapshot: DataSnapshot) => {
-            let textsArray: Text[] = Object.values(snapshot.val());
-            setTexts([...textsArray, ...texts]);
-            setTextsLoaded(true);
-        });
-        console.log(location.pathname);
+        if (location.pathname === '/') {
+            onFetchTexts((snapshot: DataSnapshot) => {
+                let textsArray: Text[] = Object.values(snapshot.val());
+                setTexts([...textsArray, ...texts]);
+                setTextsLoaded(true);
+            });
+        } else {
+            onFetchTextsFromRoom(location.pathname.substring(1), (snapshot: DataSnapshot) => {
+                let textsArray: Text[] = Object.values(snapshot.val() ?? {}) ?? [];
+                setTexts([...textsArray, ...texts]);
+                setTextsLoaded(true);
+            });
+        }
     }, []);
 
-    const loginStage = function() {
+    // Periodically save coords to local storage
+    useEffect(() => {
+        const posFromStorage = JSON.parse(localStorage.getItem('grid-chat.pos')!);
+        const roomFromStorage = localStorage.getItem('grid-chat.room');
+
+        console.log(posFromStorage);
+
+        if (posFromStorage && location.pathname.substring(1) === roomFromStorage)
+            setPos(posFromStorage)
+    }, []);
+
+    useEffect(() => {
+        // if (localStorage.getItem('grid-chat.pos')) return;
+        localStorage.setItem('grid-chat.room', location.pathname.substring(1));
+        localStorage.setItem('grid-chat.pos', JSON.stringify(getPos()));
+    }, [pos]);
+
+    const loginStage = function () {
         if (localStorage.getItem('grid-chat.credentials-stored') === 'true' && user === null) {
             return <Spinner></Spinner>
         } else if (user === null) {
@@ -75,6 +102,7 @@ function AppWrapper(props: React.ComponentProps<any>) {
                 user === null ?
                     <CSSTransition nodeRef={modalRef} in={user === null} timeout={200} classNames="fade">
                         <Modal ref={modalRef}>
+                            {/* <Modal> */}
                             {/* <ModalLoginForm></ModalLoginForm> */}
                             {loginStage()}
                         </Modal>

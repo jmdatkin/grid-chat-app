@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
-import { connect, onFetchTexts, postText } from "./services/firebase-firestore";
+import { connect, onFetchTexts, onFetchTextsFromRoom, postText, postTextToRoom } from "./services/firebase-firestore";
 import Text from "./types/Text";
 import { DataSnapshot } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -30,14 +30,10 @@ const db = connect(app);
 
 const auth = getAuth(app);
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-
-  }
-})
-
 const postTextToDb = (text: Text) => postText(db,text);
+const postTextToRoomToDb = (room: string, text: Text) => postTextToRoom(db, room, text);
 
 const fetchTextsFromDb = (cb: (snapshot: DataSnapshot) => void) => onFetchTexts(db, cb)
+const fetchTextsFromRoomDb = (room:string, cb: (snapshot: DataSnapshot) => void) => onFetchTextsFromRoom(db, room, cb)
 
-export { postTextToDb as postText, fetchTextsFromDb as onFetchTexts, auth };
+export { postTextToDb as postText, fetchTextsFromDb as onFetchTexts, fetchTextsFromRoomDb as onFetchTextsFromRoom, postTextToRoomToDb as postTextToRoom, auth };

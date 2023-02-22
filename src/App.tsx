@@ -1,5 +1,6 @@
 import { onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
 import { createContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './App.css';
 import AppWrapper from './components/AppWrapper';
