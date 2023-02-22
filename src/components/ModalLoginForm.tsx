@@ -87,7 +87,7 @@ function ModalLoginForm(props: any) {
             <div className="bg-zinc-800 border-gray-700 flex flex-col justify-around items-center">
                 <div className="flex flex-col items-center">
                     <span className="text-white text-4xl font-semibold">Grid Chat <RandomEmoji></RandomEmoji></span>
-                    <span className="text-gray-300 text-xl font-light">2D spatial messaging board</span>
+                    <span className="text-gray-300 text-xl font-light">Infinite 2D spatial messaging board</span>
                 </div>
             </div>
             <div className="flex flex-col justify-around items-center relative h-full">
