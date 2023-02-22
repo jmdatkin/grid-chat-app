@@ -6,14 +6,20 @@ import '../styles/Tagline.css';
 function Tagline(props: any) {
 
     const lines = [
+        "Log in",
         "Join now",
         "Hit the griddy",
-        "Join the conversation"
+        "Join the conversation",
+        "Achieve dreams",
+        "Hurdle obstacles",
+        "Find balance",
+        "Cultivate joy",
+        "Practice gratitude",
     ];
 
     const [currentLine, setCurrentLine] = useState(0);
 
-    const [active, setActive] = useState(false);
+    const [active, setActive] = useState(true);
 
     const FADE_DURATION = 200;
 
@@ -34,7 +40,7 @@ function Tagline(props: any) {
     }, []);
 
     return (
-        <div className={`Tagline ${active ? 'active' : ''} ${props.className} space-x-2 transition-opacity duration-${FADE_DURATION}`}>
+        <div className={`Tagline ${active ? 'active' : ''} ${props.className} flex items-center space-x-2 transition-opacity duration-${FADE_DURATION}`}>
             <span>{lines[currentLine]}</span>
             <FontAwesomeIcon icon={faArrowRight}></FontAwesomeIcon>
         </div>

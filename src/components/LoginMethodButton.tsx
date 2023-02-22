@@ -4,7 +4,7 @@ function LoginMethodButton(props: any) {
             <div className="min-w-[4rem] h-[4rem] p-3">
                 {props.icon}
             </div>
-            <div className="flex-grow text-center hidden sm:block">
+            <div className="flex-grow text-left ml-4 hidden sm:block">
                 {props.children}
             </div>
         </div>

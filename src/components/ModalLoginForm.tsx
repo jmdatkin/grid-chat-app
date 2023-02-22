@@ -24,6 +24,8 @@ function ModalLoginForm(props: any) {
 
     const [loggingIn, setLoggingIn] = useState(false);
 
+
+
     const [loginComponent, setLoginComponent] = useState<any>(null);
     const loginComponentEl = useRef(null);
 
@@ -83,11 +85,23 @@ function ModalLoginForm(props: any) {
     };
 
     return (
-        <div className="w-full h-3/4 z-[9600] bg-white rounded shadow-md grid grid-rows-2 desktop:grid-rows-1 desktop:grid-cols-2">
-            <div className="bg-zinc-800 border-gray-700 flex flex-col justify-around items-center">
-                <div className="flex flex-col items-center">
-                    <span className="text-white text-4xl font-semibold">Grid Chat <RandomEmoji></RandomEmoji></span>
-                    <span className="text-gray-300 text-xl font-light">Infinite 2D spatial messaging board</span>
+        <div className="w-full h-full md:h-3/4 z-[9600] bg-white rounded shadow-md grid grid-rows-2 desktop:grid-rows-1 desktop:grid-cols-2">
+            <div className="bg-zinc-800 border-gray-700 rounded-tl rounded-tr desktop:rounded-bl desktop:rounded-tr-none flex flex-col justify-around items-center">
+                {/* <div className="flex flex-col items-center"> */}
+                <div className="h-full grid grid-rows-3">
+                    <div></div>
+                    <div className="flex flex-col h-full items-center justify-around">
+                        <div className="flex flex-col items-center">
+                            <span className="text-white text-4xl font-semibold">Grid Chat <RandomEmoji></RandomEmoji></span>
+                            <span className="text-gray-300 text-xl font-light">Infinite 2D spatial messaging board</span>
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-center justify-around">
+                        <div className="flex flex-col items-center">
+                            <span className="text-zinc-500 text-xl font-light">Created by</span>
+                            <span className="text-zinc-400 hover:text-zinc-300 text-xl font-light"><a target="_blank" href="https://jmdatkin.github.io">Julian Atkin</a></span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div className="flex flex-col justify-around items-center relative h-full">
