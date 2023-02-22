@@ -69,7 +69,7 @@ function Canvas(props: CanvasProps) {
         let cy = mouseY * z + y;
 
         let newZ = z + zoom * z;
-
+        // let newZ = zoom;
         newZ = Math.max(0.25, Math.min(newZ, 10));
 
         let tx = -newZ / z * (cx - x) + cx;
@@ -270,20 +270,61 @@ function Canvas(props: CanvasProps) {
     };
 
 
+    let iid: any = null;
+    const previousZoom = useRef<number | null>(null);
+    const targetZoom = useRef<number | null>(null);
+    const zooming = useRef(false);
     const onWheel = function (e: React.WheelEvent) {
+        if (!zooming.current) {
+            previousZoom.current = props.pos.z;
+            zooming.current = true;
+        }
+
         let scaled = e.deltaY / 1000;
 
         let mouseX = e.pageX;
         let mouseY = e.pageY;
 
-        let { x: tx, y: ty, z: newZ } = doZoom(scaled, mouseX, mouseY);
+        const interpolationThreshold = 0.1;
 
-        props.setPos({
-            x: formatFloat(tx),
-            y: formatFloat(ty),
-            z: formatFloat(newZ)
-        });
+        const interpolateZoom = function () {
 
+            targetZoom.current = previousZoom.current! + previousZoom.current! * scaled;
+            
+            // targetZoom.current = props.pos.z + props.pos.z * scaled;
+
+            console.log(previousZoom.current!, targetZoom.current!)
+
+            let interpolatedTargetZoom = lerp(props.pos.z, targetZoom.current!, 0.5);
+
+            let finished = targetZoom.current! - interpolatedTargetZoom < interpolationThreshold;
+
+            // if (finished)
+            //     interpolatedTargetZoom = targetZoom.current!;
+
+
+            let { x: tx, y: ty, z: newZ } = doZoom(interpolatedTargetZoom, mouseX, mouseY);
+
+            console.dir({z: props.pos.z, newZ, scaled, interpolatedTargetZoom});
+
+            props.setPos({
+                x: formatFloat(tx),
+                y: formatFloat(ty),
+                z: formatFloat(newZ)
+            });
+
+            console.log(finished)
+
+            if (finished) {
+                zooming.current = false;
+                return;
+            }
+            else
+                iid = setTimeout(interpolateZoom, 1/60);
+                // requestAnimationFrame(interpolateZoom);
+            // interpolateZoom();
+        }
+        interpolateZoom();
     };
 
 
