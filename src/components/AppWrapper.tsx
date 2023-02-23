@@ -1,6 +1,6 @@
 import { DataSnapshot } from "firebase/database";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import { onFetchTexts, onFetchTextsFromRoom } from "../firebase";
+import { onAllTextsReceived, onRoomDataReceived, onTextReceived } from "../firebase";
 import { ToastContainer, Zoom } from "react-toastify";
 import Point3D from "../types/Point3D";
 import Text from "../types/Text";
@@ -16,6 +16,7 @@ import { CSSTransition } from "react-transition-group";
 import '../styles/FadeAnimation.css';
 import Spinner from "./Spinner";
 import { ClipLoader } from "react-spinners";
+import { Room } from "../types/Room";
 
 type AppWrapperProps = {
 
@@ -23,11 +24,9 @@ type AppWrapperProps = {
 
 function AppWrapper(props: React.ComponentProps<any>) {
 
-    const [pos, setPos] = useState<Point3D>({ x: 0, y: 0, z: 1 });
-
-    const getPos = () => pos;
-
     const [inputPos, setInputPos] = useState<Point2D>({ x: 0, y: 0 });
+    const [pos, setPos] = useState<Point3D>({ x: 0, y: 0, z: 1 });
+    const getPos = () => pos;
 
     const [texts, setTexts] = useState<Text[]>([]);
     const [textsLoaded, setTextsLoaded] = useState<boolean>(false);
@@ -38,22 +37,39 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     const user = useContext(UserContext);
 
-    let location = useLocation();
+    const location = useLocation();
 
+    const roomName = useRef(location.pathname.substring(1));
+
+    const [room, setRoom] = useState<Room | null>(null);
+
+    // Update texts array from Realtime Database
     useEffect(() => {
-        if (location.pathname === '/') {
-            onFetchTexts((snapshot: DataSnapshot) => {
-                let textsArray: Text[] = Object.values(snapshot.val());
-                setTexts([...textsArray, ...texts]);
-                setTextsLoaded(true);
-            });
-        } else {
-            onFetchTextsFromRoom(location.pathname.substring(1), (snapshot: DataSnapshot) => {
-                let textsArray: Text[] = Object.values(snapshot.val() ?? {}) ?? [];
-                setTexts([...textsArray, ...texts]);
-                setTextsLoaded(true);
-            });
-        }
+        onAllTextsReceived(roomName.current, (snapshot: DataSnapshot) => {
+            const values = snapshot.val();
+            let textsArray: Text[] = [];
+            if (values) {
+                textsArray = Object.values(snapshot?.val());
+            };
+            setTextsLoaded(true);
+            setTexts([...textsArray, ...texts]);
+        });
+
+        onTextReceived(roomName.current, (snapshot: DataSnapshot) => {
+            let text: Text = snapshot.val();
+            setTexts([text, ...texts]);
+            setTextsLoaded(true);
+        });
+
+        onRoomDataReceived(roomName.current, (snapshot: DataSnapshot) => {
+            let room  = snapshot.val();
+            if (room) {
+                setRoom(room);
+                // setRoom({
+                //     name: roomData.name,
+                //     );
+            }
+        });
     }, []);
 
     // Periodically save coords to local storage

@@ -1,10 +1,10 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getAuth, onAuthStateChanged} from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
-import { connect, onFetchTexts, onFetchTextsFromRoom, postText, postTextToRoom } from "./services/firebase-firestore";
+import { connect } from "./services/firebase-firestore";
 import Text from "./types/Text";
-import { DataSnapshot } from "firebase/database";
+import { DataSnapshot, get, onChildAdded, onChildChanged, onChildRemoved, onValue, push, ref, set } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -30,10 +30,63 @@ const db = connect(app);
 
 const auth = getAuth(app);
 
-const postTextToDb = (text: Text) => postText(db,text);
-const postTextToRoomToDb = (room: string, text: Text) => postTextToRoom(db, room, text);
+//Requirements
+// get all texts
+// get room data
+// get all texts from room
+// post text to room
+// get all open rooms
+// get all connected users by room
 
-const fetchTextsFromDb = (cb: (snapshot: DataSnapshot) => void) => onFetchTexts(db, cb)
-const fetchTextsFromRoomDb = (room:string, cb: (snapshot: DataSnapshot) => void) => onFetchTextsFromRoom(db, room, cb)
+const onUserEnterRoom = function (room: string, cb: (snapshot: DataSnapshot) => void) {
+  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
+  onChildAdded(usersInRoomRef, cb);
+}
 
-export { postTextToDb as postText, fetchTextsFromDb as onFetchTexts, fetchTextsFromRoomDb as onFetchTextsFromRoom, postTextToRoomToDb as postTextToRoom, auth };
+const onUserInRoomUpdate = function (room: string, cb: (snapshot: DataSnapshot) => void) {
+  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
+  onChildChanged(usersInRoomRef, cb);
+}
+
+const onAllTextsReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
+  const pathString = room == '' || !room ? 'texts' : `rooms/${room}/texts`;
+  const textsRef = ref(db, pathString);
+  onValue(textsRef, cb);
+}
+
+const onTextReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
+  const pathString = room == '' || !room ? 'texts' : `rooms/${room}/texts`;
+  const textsRef = ref(db, pathString);
+  onChildAdded(textsRef, cb);
+}
+
+const onRoomDataReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
+  const roomRef = ref(db, `rooms/${room}`);
+  get(roomRef).then(cb);
+};
+
+const createRoom = function (room: string) {
+  const roomRef = ref(db, `rooms/${room}`);
+  set(roomRef, {
+    owner: auth.currentUser!.uid,
+    texts: []
+  });
+};
+
+const roomExists = function (room: string) {
+  const roomRef = ref(db, `rooms/${room}`);
+  let exists = undefined;
+  get(roomRef).then(snapshot => {
+    exists = snapshot.exists();
+  });
+  return exists;
+}
+
+const postTextToRoom = function (room: string, text: Text, cb?: any) {
+  const pathString = room == '' || !room ? 'texts' : `rooms/${room}/texts`;
+  const textsRef = ref(db, pathString);
+  const submitNewTextRef = push(textsRef);
+  return set(submitNewTextRef, { ...text });
+};
+
+export { onUserEnterRoom, onUserInRoomUpdate, onAllTextsReceived, onTextReceived, onRoomDataReceived, createRoom, postTextToRoom, roomExists, auth };

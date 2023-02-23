@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import { FONT_FAMILY, FONT_SIZE } from "../constants";
-import { postText, postTextToRoom } from "../firebase";
+import { postTextToRoom } from "../firebase";
 import { filter } from "../services/profanity-filter";
 import Point2D from "../types/Point2D";
 import Point3D from "../types/Point3D";
@@ -47,19 +48,14 @@ function FloatingInput(props: FloatingInputProps) {
 
     const onKeyPress = function (e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key === 'Enter') {
-            if (location.pathname === '/') {
-                postText({
-                    x: props.pos.x + props.inputPos.x * props.pos.z,
-                    y: props.pos.y + props.inputPos.y * props.pos.z,
-                    content: filter.clean(value)
-                });
-            } else {
-                postTextToRoom(location.pathname.substring(1), {
-                    x: props.pos.x + props.inputPos.x * props.pos.z,
-                    y: props.pos.y + props.inputPos.y * props.pos.z,
-                    content: filter.clean(value)
-                });
-            }
+            const room = location.pathname.substring(1);
+            postTextToRoom(room, {
+                x: props.pos.x + props.inputPos.x * props.pos.z,
+                y: props.pos.y + props.inputPos.y * props.pos.z,
+                content: filter.clean(value)
+            }).then(() => {
+                toast("Message posted!");
+            });
             e.currentTarget.blur();
         }
     };
