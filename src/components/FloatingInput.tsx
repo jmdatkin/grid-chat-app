@@ -34,7 +34,7 @@ function FloatingInput(props: FloatingInputProps) {
     }, [props.inputPos]);
 
     const onInputChange = function(e: React.FormEvent<HTMLInputElement>) {
-        setValue(e.currentTarget.value.substring(0,MESSAGE_MAX_LENGTH));
+        setValue(e.currentTarget.value);
     };
 
     const onBlur = function(e: React.FormEvent<HTMLInputElement>) {
@@ -47,7 +47,7 @@ function FloatingInput(props: FloatingInputProps) {
             postText({
                 x: props.pos.x + props.inputPos.x*props.pos.z,
                 y: props.pos.y + props.inputPos.y*props.pos.z,
-                content: filter.clean(value)
+                content: filter.clean(value.substring(0,MESSAGE_MAX_LENGTH))
             });
             e.currentTarget.blur();
         }
