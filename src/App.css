@@ -75,7 +75,7 @@
 }
 
 .Modal::before {
-  background: url('../public/grid.png');
+  /* background: url('../public/grid.png'); */
   opacity: 0.04;
   content: '';
   display: block;

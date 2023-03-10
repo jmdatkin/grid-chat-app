@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FONT_FAMILY, FONT_SIZE } from "../constants";
+import { FONT_FAMILY, FONT_SIZE, MESSAGE_MAX_LENGTH } from "../constants";
 import { postText } from "../firebase";
 import { filter } from "../services/profanity-filter";
 import Point2D from "../types/Point2D";
@@ -34,7 +34,7 @@ function FloatingInput(props: FloatingInputProps) {
     }, [props.inputPos]);
 
     const onInputChange = function(e: React.FormEvent<HTMLInputElement>) {
-        setValue(e.currentTarget.value);
+        setValue(e.currentTarget.value.substring(0,MESSAGE_MAX_LENGTH));
     };
 
     const onBlur = function(e: React.FormEvent<HTMLInputElement>) {
