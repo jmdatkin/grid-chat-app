@@ -9,6 +9,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation } from "react-router-dom";
+import RoomContext from "../context/RoomContext";
 
 type SidebarProps = {
     sidebarHidden: boolean,
@@ -31,29 +32,38 @@ function Sidebar(props: SidebarProps) {
 
     const user = useContext(UserContext);
     const location = useLocation();
+    const room = useContext(RoomContext);
 
     const userString = () => user?.isAnonymous ? "Guest" : user?.displayName ?? user?.email;
 
     return (
-        <div onClick={onClickHandler} className={`Sidebar flex flex-col h-full bg-white fixed w-[300px] border-l border-zinc-300 z-[999] shadow-md  ${props.sidebarHidden ? 'Sidebar-hidden' : ''}`}>
-            <div className="SidebarSectionHeader bg-zinc-800 w-full h-19">
+        <div onClick={onClickHandler} className={`Sidebar flex flex-col h-full bg-white fixed w-[300px] border-l z-[999] shadow-sm  ${props.sidebarHidden ? 'Sidebar-hidden' : ''}`}>
+            <div className="SidebarSectionHeader border-b w-full h-16">
                 <div className="flex justify-between items-center w-full p-2 pl-4">
-                    <div className="text-zinc-50 space-x-2">
-                        <span className="font-bold text-3xl">Grid Chat</span>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-lg">{room !== null ? room!.name : 'Public'}</span>
+                        {/* <span>
+                        <span className="font-bold font-mono text-zinc-600 tracking-tight text-sm text-ellipsis">Owner</span>
+                        <span className="font-mono">{room !== null ? room!.owner : 'Public'}</span>
+                        </span> */}
                     </div>
                     <div className="flex">
-                        <IconButton style={{ color: 'white' }} icon={faRightFromBracket} clickHandler={signOutHandler}></IconButton>
-                        <IconButton label="Testing" style={{ color: 'white' }} icon={faTimes} clickHandler={() => props.setSidebarHidden(true)}></IconButton>
+                        {/* <IconButton style={{ color: 'white' }} icon={faRightFromBracket} clickHandler={signOutHandler}></IconButton>
+                        <IconButton label="Testing" style={{ color: 'white' }} icon={faTimes} clickHandler={() => props.setSidebarHidden(true)}></IconButton> */}
+                        <IconButton icon={faRightFromBracket} clickHandler={signOutHandler}></IconButton>
+                        <IconButton label="Testing" icon={faTimes} clickHandler={() => props.setSidebarHidden(true)}></IconButton>
                     </div>
                 </div>
                 <div className="SidebarInfo flex flex-col">
                     {/* <span>Signed in as: <strong>{user?.isAnonymous ? 'anonymous' : user?.email}</strong></span> */}
                 </div>
             </div>
-            <div className="SidebarSectionBody p-4 flex-grow">
-                    <div className="w-full h-8 text-dark font-mono">
-                        {location.pathname.substring(1)} 
+            <div className="SidebarSectionBody flex-grow">
+                <section className="border-b p-4">
+                    <div className="w-full h-8 text-dark text-sm font-semibold">
+                        <span>In Room</span>
                     </div>
+                </section>
             </div>
             <div className="SidebarSectionFooter h-14 bg-zinc-800 w-full p-2 px-4 flex justify-between items-center">
                 <div className="text-zinc-50 space-x-2">

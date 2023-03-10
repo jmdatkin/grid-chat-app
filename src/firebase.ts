@@ -4,7 +4,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { connect } from "./services/firebase-firestore";
 import Text from "./types/Text";
-import { DataSnapshot, get, onChildAdded, onChildChanged, onChildRemoved, onValue, push, ref, set } from "firebase/database";
+import { DataSnapshot, get, onChildAdded, onChildChanged, onChildRemoved, onDisconnect, onValue, push, ref, remove, set } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -48,6 +48,51 @@ const onUserInRoomUpdate = function (room: string, cb: (snapshot: DataSnapshot) 
   onChildChanged(usersInRoomRef, cb);
 }
 
+const addSelfToConnectedRoom = function (room: string) {
+  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
+  const newUserRef = push(usersInRoomRef, {
+    uid: auth.currentUser!.uid,
+    displayName: auth.currentUser?.displayName,
+    email: auth.currentUser!.email
+  });
+  return newUserRef.key;
+};
+
+const removeSelfFromConnectedRoom = async function (room: string) {
+  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
+
+  const users = await get(usersInRoomRef);
+
+  console.log(users.val());
+
+  users.forEach(snapshot => {
+    const uid = snapshot.val().uid;
+    if (uid !== auth.currentUser!.uid) return;
+    const removeUserRef = ref(db, `rooms/${room}/connected/${snapshot.key}`);
+    remove(removeUserRef);
+  });
+
+  // const users.forEach()
+
+  // const newUserRef = push(usersInRoomRef, {
+  //   uid: auth.currentUser!.uid,
+  //   displayName: auth.currentUser?.displayName,
+  //   email: auth.currentUser!.email
+  // });
+};
+
+const onUserDisconnect = function(room: string, userKey: string) {
+  const presenceRef = ref(db, `rooms/${room}/connected/userKey`);
+  onDisconnect(presenceRef).remove();
+};
+
+const onAllUsersInRoomReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
+  const pathString = room == '' || !room ? 'texts' : `rooms/${room}/connected`;
+  const usersRef = ref(db, pathString);
+  onValue(usersRef, cb);
+}
+
+
 const onAllTextsReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
   const pathString = room == '' || !room ? 'texts' : `rooms/${room}/texts`;
   const textsRef = ref(db, pathString);
@@ -60,16 +105,14 @@ const onTextReceived = function (room: string, cb: (snapshot: DataSnapshot) => v
   onChildAdded(textsRef, cb);
 }
 
-const onRoomDataReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
-  const roomRef = ref(db, `rooms/${room}`);
-  get(roomRef).then(cb);
-};
-
 const createRoom = function (room: string) {
   const roomRef = ref(db, `rooms/${room}`);
   set(roomRef, {
     owner: auth.currentUser!.uid,
-    texts: []
+    texts: [],
+    connectedUsers: [],
+    open: false,
+    allowList: [],
   });
 };
 
@@ -89,4 +132,4 @@ const postTextToRoom = function (room: string, text: Text, cb?: any) {
   return set(submitNewTextRef, { ...text });
 };
 
-export { onUserEnterRoom, onUserInRoomUpdate, onAllTextsReceived, onTextReceived, onRoomDataReceived, createRoom, postTextToRoom, roomExists, auth };
+export { onUserEnterRoom, onUserInRoomUpdate, onAllTextsReceived, onTextReceived, onRoomDataReceived, createRoom, postTextToRoom, roomExists, addSelfToConnectedRoom, removeSelfFromConnectedRoom, onUserDisconnect, auth };

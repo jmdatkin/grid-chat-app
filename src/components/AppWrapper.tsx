@@ -1,6 +1,6 @@
 import { DataSnapshot } from "firebase/database";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import { onAllTextsReceived, onRoomDataReceived, onTextReceived } from "../firebase";
+import { addSelfToConnectedRoom, onAllTextsReceived, onRoomDataReceived, onTextReceived } from "../firebase";
 import { ToastContainer, Zoom } from "react-toastify";
 import Point3D from "../types/Point3D";
 import Text from "../types/Text";
@@ -17,6 +17,7 @@ import '../styles/FadeAnimation.css';
 import Spinner from "./Spinner";
 import { ClipLoader } from "react-spinners";
 import { Room } from "../types/Room";
+import RoomContext from "../context/RoomContext";
 
 type AppWrapperProps = {
 
@@ -29,23 +30,21 @@ function AppWrapper(props: React.ComponentProps<any>) {
     const getPos = () => pos;
 
     const [texts, setTexts] = useState<Text[]>([]);
-    const [textsLoaded, setTextsLoaded] = useState<boolean>(false);
+    const [textsLoaded, setTextsLoaded] = useState<boolean>(true);
 
     const [sidebarHidden, setSidebarHidden] = useState(true);
 
     const modalRef = useRef(null);
 
     const user = useContext(UserContext);
-
-    const location = useLocation();
-
-    const roomName = useRef(location.pathname.substring(1));
-
-    const [room, setRoom] = useState<Room | null>(null);
+    const room = useRef(useContext(RoomContext));
 
     // Update texts array from Realtime Database
     useEffect(() => {
-        onAllTextsReceived(roomName.current, (snapshot: DataSnapshot) => {
+        console.log(room.current);
+
+        if (room.current === null) return;
+        onAllTextsReceived(room.current!.name, (snapshot: DataSnapshot) => {
             const values = snapshot.val();
             let textsArray: Text[] = [];
             if (values) {
@@ -55,37 +54,30 @@ function AppWrapper(props: React.ComponentProps<any>) {
             setTexts([...textsArray, ...texts]);
         });
 
-        onTextReceived(roomName.current, (snapshot: DataSnapshot) => {
+        onTextReceived(room.current!.name, (snapshot: DataSnapshot) => {
             let text: Text = snapshot.val();
             setTexts([text, ...texts]);
             setTextsLoaded(true);
         });
 
-        onRoomDataReceived(roomName.current, (snapshot: DataSnapshot) => {
-            let room  = snapshot.val();
-            if (room) {
-                setRoom(room);
-                // setRoom({
-                //     name: roomData.name,
-                //     );
-            }
-        });
+        localStorage.setItem('grid-chat.room', room.current!.name);
+
     }, []);
 
     // Periodically save coords to local storage
     useEffect(() => {
+        if (room.current === null) return;
+
         const posFromStorage = JSON.parse(localStorage.getItem('grid-chat.pos')!);
         const roomFromStorage = localStorage.getItem('grid-chat.room');
 
         console.log(posFromStorage);
 
-        if (posFromStorage && location.pathname.substring(1) === roomFromStorage)
+        if (posFromStorage && room.current!.name === roomFromStorage)
             setPos(posFromStorage)
     }, []);
 
     useEffect(() => {
-        // if (localStorage.getItem('grid-chat.pos')) return;
-        localStorage.setItem('grid-chat.room', location.pathname.substring(1));
         localStorage.setItem('grid-chat.pos', JSON.stringify(getPos()));
     }, [pos]);
 
@@ -121,7 +113,7 @@ function AppWrapper(props: React.ComponentProps<any>) {
             {
                 user === null ?
                     <CSSTransition nodeRef={modalRef} in={user === null} timeout={200} classNames="fade">
-                        <Modal ref={modalRef}>
+                        <Modal>
                             {/* <Modal> */}
                             {/* <ModalLoginForm></ModalLoginForm> */}
                             {loginStage()}
