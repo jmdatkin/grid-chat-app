@@ -2,14 +2,14 @@ import IconButton from "./IconButton";
 import '../styles/Sidebar.css';
 import { faRightFromBracket, faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";
-import { UserContext } from "../App";
+import { UserContext, RoomContext } from "../App";
 import { Tooltip } from "react-tooltip";
 import LoginForm from "./LoginForm";
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { User, signOut } from "firebase/auth";
+import { auth, userSignOut } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation } from "react-router-dom";
-import RoomContext from "../context/RoomContext";
+import Avatar from "./Avatar";
 
 type SidebarProps = {
     sidebarHidden: boolean,
@@ -18,10 +18,7 @@ type SidebarProps = {
 };
 
 const signOutHandler = function () {
-    console.log('HILSADJ')
-    signOut(auth)
-        .then(() => window.location.href = window.location.href)
-        .catch(() => console.log("Error"));
+    userSignOut().then(() => window.location.href = window.location.href);
 };
 
 const onClickHandler = function (e: any) {
@@ -35,6 +32,15 @@ function Sidebar(props: SidebarProps) {
     const room = useContext(RoomContext);
 
     const userString = () => user?.isAnonymous ? "Guest" : user?.displayName ?? user?.email;
+
+    const usersList = function() {
+        if (room && room.connected) {
+            return Object.values(room.connected).map((user: any) => {
+                return (<span>{user.uid}</span>);
+            });
+        }
+        return '';
+    };
 
     return (
         <div onClick={onClickHandler} className={`Sidebar flex flex-col h-full bg-white fixed w-[300px] border-l z-[999] shadow-sm  ${props.sidebarHidden ? 'Sidebar-hidden' : ''}`}>
@@ -60,14 +66,18 @@ function Sidebar(props: SidebarProps) {
             </div>
             <div className="SidebarSectionBody flex-grow">
                 <section className="border-b p-4">
-                    <div className="w-full h-8 text-dark text-sm font-semibold">
+                    <div className="w-full text-dark text-sm font-semibold">
                         <span>In Room</span>
+                        <div className="flex flex-col">
+                            {usersList()} 
+                        </div>
                     </div>
                 </section>
             </div>
             <div className="SidebarSectionFooter h-14 bg-zinc-800 w-full p-2 px-4 flex justify-between items-center">
-                <div className="text-zinc-50 space-x-2">
-                    <FontAwesomeIcon className="" icon={faUser}></FontAwesomeIcon>
+                <div className="text-zinc-50 space-x-2 flex items-center">
+                    {/* <FontAwesomeIcon className="" icon={faUser}></FontAwesomeIcon> */}
+                    <Avatar></Avatar>
                     <span>{userString()}</span>
                 </div>
             </div>

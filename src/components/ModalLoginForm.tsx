@@ -99,7 +99,7 @@ function ModalLoginForm(props: any) {
                     <div className="flex flex-col items-center justify-around">
                         <div className="flex flex-col items-center">
                             <span className="text-zinc-500 text-xl font-light">Created by</span>
-                            <span className="text-zinc-400 hover:text-zinc-300 text-xl font-light"><a target="_blank" href="https://jmdatkin.github.io">Julian Atkin</a></span>
+                            <span className="text-zinc-400 hover:text-zinc-300 text-xl font-light"><a target="_blank" href="https://jatkin.dev/">Julian Atkin</a></span>
                         </div>
                     </div>
                 </div>

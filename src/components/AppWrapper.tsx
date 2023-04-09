@@ -1,6 +1,6 @@
 import { DataSnapshot } from "firebase/database";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import { addSelfToConnectedRoom, onAllTextsReceived, onRoomDataReceived, onTextReceived } from "../firebase";
+import { onAllTextsReceived, onRoomDataReceived, onTextReceived } from "../firebase";
 import { ToastContainer, Zoom } from "react-toastify";
 import Point3D from "../types/Point3D";
 import Text from "../types/Text";
@@ -18,6 +18,9 @@ import Spinner from "./Spinner";
 import { ClipLoader } from "react-spinners";
 import { Room } from "../types/Room";
 import RoomContext from "../context/RoomContext";
+import DialogModal from "./DialogModal";
+import DialogContainer from "./DialogContainer";
+import ProfileDialog from "./ProfileDialog";
 
 type AppWrapperProps = {
 
@@ -34,6 +37,7 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     const [sidebarHidden, setSidebarHidden] = useState(true);
 
+    const dialogModalRef = useRef(null);
     const modalRef = useRef(null);
 
     const user = useContext(UserContext);
@@ -41,7 +45,6 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     // Update texts array from Realtime Database
     useEffect(() => {
-        console.log(room.current);
 
         if (room.current === null) return;
         onAllTextsReceived(room.current!.name, (snapshot: DataSnapshot) => {
@@ -94,6 +97,7 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     return (
         <div className="AppWrapper">
+        
             <div className="AppLayer" onClick={() => setSidebarHidden(true)}>
                 <Sidebar sidebarHidden={sidebarHidden} setSidebarHidden={setSidebarHidden} setUser={props.setUser}></Sidebar>
                 <Toolbar
