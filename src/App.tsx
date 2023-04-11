@@ -26,6 +26,8 @@ function App() {
 
   useEffect(() => {
 
+    console.log(localStorage.getItem('grid-chat.presence-ref-key'));
+
     let presenceRef: DatabaseReference | null = null;
 
     onRoomDataReceived(roomName.current, (snapshot: DataSnapshot) => {
@@ -43,12 +45,15 @@ function App() {
       if (user) {
         setUser(user);
 
-        presenceRef = await getOrAddPresenceRef(roomName.current);
-        onDisconnect(presenceRef).remove();
+        if (!connected.current) {
 
-        if (localStorage.getItem('grid-chat.credentials-stored') !== 'true') toast("Successfully logged in!");
-        localStorage.setItem('grid-chat.credentials-stored', 'true');
-        connected.current = true;
+          presenceRef = await getOrAddPresenceRef(roomName.current);
+          onDisconnect(presenceRef).remove();
+
+          if (localStorage.getItem('grid-chat.credentials-stored') !== 'true') toast("Successfully logged in!");
+          localStorage.setItem('grid-chat.credentials-stored', 'true');
+          connected.current = true;
+        }
       } else {
         localStorage.setItem('grid-chat.credentials-stored', 'false');
       }

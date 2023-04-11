@@ -1,4 +1,4 @@
-import { DataSnapshot } from "firebase/database";
+import { DataSnapshot, off } from "firebase/database";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { onAllTextsReceived, onRoomDataReceived, onTextReceived } from "../firebase";
 import { ToastContainer, Zoom } from "react-toastify";
@@ -11,13 +11,12 @@ import Point2D from "../types/Point2D";
 import Sidebar from "./Sidebar";
 import Modal from "./Modal";
 import ModalLoginForm from "./ModalLoginForm";
-import { UserContext } from "../App";
+import { UserContext, RoomContext } from "../App";
 import { CSSTransition } from "react-transition-group";
 import '../styles/FadeAnimation.css';
 import Spinner from "./Spinner";
 import { ClipLoader } from "react-spinners";
 import { Room } from "../types/Room";
-import RoomContext from "../context/RoomContext";
 import DialogModal from "./DialogModal";
 import DialogContainer from "./DialogContainer";
 import ProfileDialog from "./ProfileDialog";
@@ -41,42 +40,51 @@ function AppWrapper(props: React.ComponentProps<any>) {
     const modalRef = useRef(null);
 
     const user = useContext(UserContext);
-    const room = useRef(useContext(RoomContext));
+    const room = useContext(RoomContext);
 
     // Update texts array from Realtime Database
     useEffect(() => {
 
-        if (room.current === null) return;
-        onAllTextsReceived(room.current!.name, (snapshot: DataSnapshot) => {
+        if (room === null) return;
+        const unsubscribeAllTextsReceived = onAllTextsReceived(room!.name, (snapshot: DataSnapshot) => {
             const values = snapshot.val();
             let textsArray: Text[] = [];
             if (values) {
                 textsArray = Object.values(snapshot?.val());
             };
             setTextsLoaded(true);
-            setTexts([...textsArray, ...texts]);
+            // setTexts([...textsArray, ...texts]);
+            setTexts(textsArray);
         });
 
-        onTextReceived(room.current!.name, (snapshot: DataSnapshot) => {
-            let text: Text = snapshot.val();
-            setTexts([text, ...texts]);
-            setTextsLoaded(true);
-        });
+        // const unsubscribeTextReceived = onTextReceived(room!.name, (snapshot: DataSnapshot) => {
+        //     let text: Text = snapshot.val();
+        //     // setTexts([text, ...texts]);
+        //     setTexts((prev) => {
+        //         return [text, ...prev]
+        //     });
+        //     setTextsLoaded(true);
+        // });
 
-        localStorage.setItem('grid-chat.room', room.current!.name);
+        localStorage.setItem('grid-chat.room', room!.name);
 
-    }, []);
+        return () => {
+            unsubscribeAllTextsReceived();
+            // unsubscribeTextReceived();
+        }
+
+    }, [room]);
 
     // Periodically save coords to local storage
     useEffect(() => {
-        if (room.current === null) return;
+        if (room === null) return;
 
         const posFromStorage = JSON.parse(localStorage.getItem('grid-chat.pos')!);
         const roomFromStorage = localStorage.getItem('grid-chat.room');
 
         console.log(posFromStorage);
 
-        if (posFromStorage && room.current!.name === roomFromStorage)
+        if (posFromStorage && room!.name === roomFromStorage)
             setPos(posFromStorage)
     }, []);
 

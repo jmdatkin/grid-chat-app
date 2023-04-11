@@ -102,8 +102,10 @@ const getOrAddPresenceRef = async function (room: string) {
     if (!(await get(newUserRef)).exists()) {
       newUserRef = null;
     }
+  } else {
+    newUserRef = await getKeyFromConnected(room);
   }
-  
+
   if (newUserRef === null) {
     const presenceKey = await getKeyFromConnected(room);
     if (presenceKey === null) {
@@ -146,31 +148,31 @@ const removeSelfFromConnectedRoom = async function (room: string) {
 
 const onUserDisconnect = function (room: string, userKey: string) {
   const presenceRef = ref(db, `rooms/${room}/connected/${userKey}`);
-  onDisconnect(presenceRef).remove();
+  return onDisconnect(presenceRef).remove();
 };
 
 const onAllUsersInRoomReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
   const pathString = room == '' || !room ? 'texts' : `rooms/${room}/connected`;
   const usersRef = ref(db, pathString);
-  onValue(usersRef, cb);
+  return onValue(usersRef, cb);
 }
 
 
 const onAllTextsReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
   const pathString = room == '' || !room ? 'texts' : `rooms/${room}/texts`;
   const textsRef = ref(db, pathString);
-  onValue(textsRef, cb);
+  return onValue(textsRef, cb);
 }
 
 const onTextReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
   const pathString = room == '' || !room ? 'texts' : `rooms/${room}/texts`;
   const textsRef = ref(db, pathString);
-  onChildAdded(textsRef, cb);
+  return onChildAdded(textsRef, cb);
 }
 
 const onRoomDataReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
   const roomRef = ref(db, `rooms/${room}`);
-  onValue(roomRef, cb);
+  return onValue(roomRef, cb);
 };
 
 const createRoom = function (room: string) {
