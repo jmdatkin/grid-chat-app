@@ -1,7 +1,7 @@
 import IconButton from "./IconButton";
 import '../styles/Sidebar.css';
 import { faRightFromBracket, faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext, RoomContext } from "../App";
 import { Tooltip } from "react-tooltip";
 import LoginForm from "./LoginForm";
@@ -14,7 +14,8 @@ import Avatar from "./Avatar";
 type SidebarProps = {
     sidebarHidden: boolean,
     setSidebarHidden: Function,
-    setUser: Function
+    setUser: Function,
+    setDialogModalOpen: Function
 };
 
 const signOutHandler = function () {
@@ -31,12 +32,25 @@ function Sidebar(props: SidebarProps) {
     const location = useLocation();
     const room = useContext(RoomContext);
 
-    const userString = () => user?.isAnonymous ? "Guest" : user?.displayName ?? user?.email;
+    const [userString, setUserString] = useState<string | null>(null);
 
-    const usersList = function() {
+    useEffect(() => {
+        if (user === null) {
+            setUserString('');
+        }
+        else if (user?.isAnonymous) {
+            setUserString(user.displayName || "Guest");
+        } else {
+            setUserString(user.displayName || user.email);
+        }
+    }, [user?.displayName]);
+
+    const usersList = function () {
         if (room && room.connected) {
             return Object.values(room.connected).map((user: any) => {
-                return (<span>{user.uid}</span>);
+                // console.log(user);
+                return (<span>{user.displayName || user.uid}</span>);
+                // return (<span>{user.displayName}</span>);
             });
         }
         return '';
@@ -57,7 +71,7 @@ function Sidebar(props: SidebarProps) {
                         {/* <IconButton style={{ color: 'white' }} icon={faRightFromBracket} clickHandler={signOutHandler}></IconButton>
                         <IconButton label="Testing" style={{ color: 'white' }} icon={faTimes} clickHandler={() => props.setSidebarHidden(true)}></IconButton> */}
                         <IconButton icon={faRightFromBracket} clickHandler={signOutHandler}></IconButton>
-                        <IconButton label="Testing" icon={faTimes} clickHandler={() => props.setSidebarHidden(true)}></IconButton>
+                        <IconButton icon={faTimes} clickHandler={() => props.setSidebarHidden(true)}></IconButton>
                     </div>
                 </div>
                 <div className="SidebarInfo flex flex-col">
@@ -69,7 +83,7 @@ function Sidebar(props: SidebarProps) {
                     <div className="w-full text-dark text-sm font-semibold">
                         <span>In Room</span>
                         <div className="flex flex-col">
-                            {usersList()} 
+                            {usersList()}
                         </div>
                     </div>
                 </section>
@@ -77,8 +91,8 @@ function Sidebar(props: SidebarProps) {
             <div className="SidebarSectionFooter h-14 bg-zinc-800 w-full p-2 px-4 flex justify-between items-center">
                 <div className="text-zinc-50 space-x-2 flex items-center">
                     {/* <FontAwesomeIcon className="" icon={faUser}></FontAwesomeIcon> */}
-                    <Avatar></Avatar>
-                    <span>{userString()}</span>
+                    <Avatar onClick={() => props.setDialogModalOpen(true)}></Avatar>
+                    <span>{userString}</span>
                 </div>
             </div>
         </div>

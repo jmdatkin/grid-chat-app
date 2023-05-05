@@ -1,5 +1,7 @@
 // import '../styles/Button.css';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 // type ButtonProps = {
 //     style: string,
@@ -22,6 +24,8 @@ function Button(props: any) {
 
     return ( 
         <button type="submit" className={`${props.className} GridChatButton px-4 py-3 rounded transition-all duration-75 ${props.style ? styles[props.style as string] : styles.default}`} onClick={handleClick}>
+            {props.icon ?
+            <FontAwesomeIcon icon={props.icon}></FontAwesomeIcon> : ''}
             {props.label}
         </button>
      );

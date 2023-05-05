@@ -1,6 +1,6 @@
 import { DataSnapshot, off } from "firebase/database";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import { onAllTextsReceived, onRoomDataReceived, onTextReceived } from "../firebase";
+import { auth, onAllTextsReceived, onRoomDataReceived, onTextReceived } from "../firebase";
 import { ToastContainer, Zoom } from "react-toastify";
 import Point3D from "../types/Point3D";
 import Text from "../types/Text";
@@ -37,6 +37,8 @@ function AppWrapper(props: React.ComponentProps<any>) {
     const [sidebarHidden, setSidebarHidden] = useState(true);
 
     const dialogModalRef = useRef(null);
+    const [dialogModalOpen, setDialogModalOpen] = useState(false);
+
     const modalRef = useRef(null);
 
     const user = useContext(UserContext);
@@ -105,9 +107,8 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     return (
         <div className="AppWrapper">
-        
             <div className="AppLayer" onClick={() => setSidebarHidden(true)}>
-                <Sidebar sidebarHidden={sidebarHidden} setSidebarHidden={setSidebarHidden} setUser={props.setUser}></Sidebar>
+                <Sidebar sidebarHidden={sidebarHidden} setSidebarHidden={setSidebarHidden}  setUser={props.setUser} setDialogModalOpen={setDialogModalOpen}></Sidebar>
                 <Toolbar
                     pos={pos}
                     setPos={setPos}
@@ -133,6 +134,13 @@ function AppWrapper(props: React.ComponentProps<any>) {
                     </CSSTransition>
                     : <></>
             }
+            <DialogModal open={dialogModalOpen} setDialogModalOpen={setDialogModalOpen}>
+                <DialogContainer>
+                    <ProfileDialog user={auth.currentUser} setDialogModalOpen={setDialogModalOpen}>
+
+                    </ProfileDialog>
+                </DialogContainer>
+            </DialogModal>
             <ToastContainer
                 position="top-right"
                 theme="colored"

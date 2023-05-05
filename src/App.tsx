@@ -32,7 +32,7 @@ function App() {
 
     onRoomDataReceived(roomName.current, (snapshot: DataSnapshot) => {
       let room = snapshot.val();
-
+      console.log(room);
       if (room) {
         setRoom({
           name: roomName.current,

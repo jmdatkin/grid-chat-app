@@ -111,6 +111,8 @@ const getOrAddPresenceRef = async function (room: string) {
     if (presenceKey === null) {
       newUserRef = push(usersInRoomRef, {
         uid: auth.currentUser!.uid,
+        displayName: auth.currentUser!.displayName,
+        email: auth.currentUser!.email,
       });
     } else {
       newUserRef = ref(db, `rooms/${room}/connected/${presenceKey}`);
