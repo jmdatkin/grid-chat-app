@@ -2,8 +2,8 @@ import LoginMethodButton from "./LoginMethodButton";
 import { faEnvelope, faUser } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
-import { AuthError, GoogleAuthProvider, signInAnonymously, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth } from "../firebase";
+import { AuthError, GoogleAuthProvider, signInAnonymously, signInWithEmailAndPassword, signInWithPopup} from "firebase/auth";
+import { auth, updateProfile } from "../firebase";
 import '../styles/FadeAnimation.css';
 import InputText from "./InputText";
 import { CSSTransition } from 'react-transition-group';
@@ -12,6 +12,7 @@ import LoginMethods from "./LoginMethods";
 import EmailLoginForm from "./EmailLoginForm";
 import Spinner from "./Spinner";
 import RandomEmoji from "./RandomEmoji";
+import GuestDisplayNameForm from "./GuestDisplayNameForm";
 
 
 function ModalLoginForm(props: any) {
@@ -40,7 +41,8 @@ function ModalLoginForm(props: any) {
                 break;
 
             case LoginMethod.GUEST:
-                login();
+                setLoginComponent(<GuestDisplayNameForm setLoginMethod={setLoginMethod} login={login}></GuestDisplayNameForm>);
+                // login();
                 break;
 
             default:
@@ -53,6 +55,12 @@ function ModalLoginForm(props: any) {
         switch (loginMethod) {
             case LoginMethod.GUEST:
                 signInAnonymously(auth)
+                    .then(userCredential => {
+                        console.log(params);
+                        updateProfile(userCredential.user, {
+                            displayName: params.displayName
+                        });
+                    })
                     .catch((error: AuthError) => {
                         setLoggingIn(false);
                         setErrorCode(error.code);

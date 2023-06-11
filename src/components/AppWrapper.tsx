@@ -46,7 +46,6 @@ function AppWrapper(props: React.ComponentProps<any>) {
 
     // Update texts array from Realtime Database
     useEffect(() => {
-
         if (room === null) return;
         const unsubscribeAllTextsReceived = onAllTextsReceived(room!.name, (snapshot: DataSnapshot) => {
             const values = snapshot.val();
@@ -55,24 +54,13 @@ function AppWrapper(props: React.ComponentProps<any>) {
                 textsArray = Object.values(snapshot?.val());
             };
             setTextsLoaded(true);
-            // setTexts([...textsArray, ...texts]);
             setTexts(textsArray);
         });
-
-        // const unsubscribeTextReceived = onTextReceived(room!.name, (snapshot: DataSnapshot) => {
-        //     let text: Text = snapshot.val();
-        //     // setTexts([text, ...texts]);
-        //     setTexts((prev) => {
-        //         return [text, ...prev]
-        //     });
-        //     setTextsLoaded(true);
-        // });
 
         localStorage.setItem('grid-chat.room', room!.name);
 
         return () => {
             unsubscribeAllTextsReceived();
-            // unsubscribeTextReceived();
         }
 
     }, [room]);

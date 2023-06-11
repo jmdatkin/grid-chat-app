@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import './App.css';
 import AppWrapper from './components/AppWrapper';
 import MainCanvasWrapper from './components/CanvasWrapper';
-import { auth, getOrAddPresenceRef, isSelfInRoom, onRoomDataReceived, onUserDisconnect, removeSelfFromConnectedRoom } from './firebase';
+import { auth, initializeUser, isSelfInRoom, onRoomDataReceived, onUserDisconnect, removeSelfFromConnectedRoom } from './firebase';
 import { Room } from './types/Room';
 
 const RoomContext = createContext<Room | null>(null);
@@ -47,7 +47,7 @@ function App() {
 
         if (!connected.current) {
 
-          presenceRef = await getOrAddPresenceRef(roomName.current);
+          presenceRef = await initializeUser(roomName.current);
           onDisconnect(presenceRef).remove();
 
           if (localStorage.getItem('grid-chat.credentials-stored') !== 'true') toast("Successfully logged in!");

@@ -3,5 +3,5 @@ import { User } from "firebase/auth"
 export type Room = {
     name: string,
     owner: string,
-    connected: User[]
+    users: User[]
 }

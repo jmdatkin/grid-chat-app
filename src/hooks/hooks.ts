@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect } from "react";
+import { MutableRefObject, useEffect, useRef } from "react";
 
 // const useMouseDrag = function (target: HTMLElement) {
 const useMouseDrag = function (target: MutableRefObject<null>) {
@@ -48,4 +48,12 @@ const useMouseDrag = function (target: MutableRefObject<null>) {
     };
 };
 
-export { useMouseDrag };
+const usePrevious = (value: any) => {
+  const prev = useRef(null)
+  useEffect(() => {
+    prev.current = value
+  });
+  return prev.current
+}
+
+export { useMouseDrag, usePrevious };

@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { User, getAuth, onAuthStateChanged, signOut, updateProfile } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { connect } from "./services/firebase-firestore";
 import Text from "./types/Text";
@@ -38,21 +38,21 @@ let userPresenceRef: DatabaseReference | null = null;
 // get all texts from room
 // post text to room
 // get all open rooms
-// get all connected users by room
+// get all users users by room
 
 const onUserEnterRoom = function (room: string, cb: (snapshot: DataSnapshot) => void) {
-  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
-  onChildAdded(usersInRoomRef, cb);
+  const usersInRoomRef = ref(db, `rooms/${room}/users`);
+  return onChildAdded(usersInRoomRef, cb);
 }
 
 const onUserInRoomUpdate = function (room: string, cb: (snapshot: DataSnapshot) => void) {
-  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
+  const usersInRoomRef = ref(db, `rooms/${room}/users`);
   onChildChanged(usersInRoomRef, cb);
 }
 
 
 const isSelfInRoom = async function (room: string) {
-  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
+  const usersInRoomRef = ref(db, `rooms/${room}/users`);
 
   let userAlreadyInRoom = false;
 
@@ -71,8 +71,8 @@ const isSelfInRoom = async function (room: string) {
   return Promise.resolve(userAlreadyInRoom);
 };
 
-const getKeyFromConnected = async function (room: string) {
-  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
+const getOwnPresenceKey = async function (room: string) {
+  const usersInRoomRef = ref(db, `rooms/${room}/users`);
 
   let presenceKey = null;
 
@@ -89,8 +89,8 @@ const getKeyFromConnected = async function (room: string) {
   return presenceKey;
 }
 
-const getOrAddPresenceRef = async function (room: string) {
-  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
+const initializeUser = async function (room: string) {
+  const usersInRoomRef = ref(db, `rooms/${room}/users`);
 
   let newUserRef = null;
 
@@ -98,16 +98,16 @@ const getOrAddPresenceRef = async function (room: string) {
   //TODO: fix problem of closing browser window but key remains in localStorage that points to non-existent presence
 
   if (localStorage.getItem('grid-chat.presence-ref-key')) {
-    newUserRef = ref(db, `rooms/${room}/connected/${localStorage.getItem('grid-chat.presence-ref-key')}`);
+    newUserRef = ref(db, `rooms/${room}/users/${localStorage.getItem('grid-chat.presence-ref-key')}`);
     if (!(await get(newUserRef)).exists()) {
       newUserRef = null;
     }
   } else {
-    newUserRef = await getKeyFromConnected(room);
+    newUserRef = await getOwnPresenceKey(room);
   }
 
   if (newUserRef === null) {
-    const presenceKey = await getKeyFromConnected(room);
+    const presenceKey = await getOwnPresenceKey(room);
     if (presenceKey === null) {
       newUserRef = push(usersInRoomRef, {
         uid: auth.currentUser!.uid,
@@ -115,7 +115,7 @@ const getOrAddPresenceRef = async function (room: string) {
         email: auth.currentUser!.email,
       });
     } else {
-      newUserRef = ref(db, `rooms/${room}/connected/${presenceKey}`);
+      newUserRef = ref(db, `rooms/${room}/users/${presenceKey}`);
     }
     localStorage.setItem('grid-chat.presence-ref-key', newUserRef.key!);
   }
@@ -135,26 +135,35 @@ const userSignOut = function () {
   }
 };
 
+const _updateProfile = function(user: User, data: {displayName?: string, photoUrl?: string}) {
+  updateProfile(user, data)
+  .then(() => {
+    set(userPresenceRef!, {
+      displayName: data.displayName
+    })
+  })
+}
+
 const removeSelfFromConnectedRoom = async function (room: string) {
-  const usersInRoomRef = ref(db, `rooms/${room}/connected`);
+  const usersInRoomRef = ref(db, `rooms/${room}/users`);
 
   const users = await get(usersInRoomRef);
 
   users.forEach(snapshot => {
     const uid = snapshot.val().uid;
     if (uid !== auth.currentUser!.uid) return;
-    const removeUserRef = ref(db, `rooms/${room}/connected/${snapshot.key}`);
+    const removeUserRef = ref(db, `rooms/${room}/users/${snapshot.key}`);
     remove(removeUserRef);
   });
 };
 
 const onUserDisconnect = function (room: string, userKey: string) {
-  const presenceRef = ref(db, `rooms/${room}/connected/${userKey}`);
+  const presenceRef = ref(db, `rooms/${room}/users/${userKey}`);
   return onDisconnect(presenceRef).remove();
 };
 
-const onAllUsersInRoomReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
-  const pathString = room == '' || !room ? 'texts' : `rooms/${room}/connected`;
+const onUsersReceived = function (room: string, cb: (snapshot: DataSnapshot) => void) {
+  const pathString = room == '' || !room ? 'texts' : `rooms/${room}/users`;
   const usersRef = ref(db, pathString);
   return onValue(usersRef, cb);
 }
@@ -182,7 +191,7 @@ const createRoom = function (room: string) {
   set(roomRef, {
     owner: auth.currentUser!.uid,
     texts: [],
-    connectedUsers: [],
+    usersUsers: [],
     open: false,
     allowList: [],
   });
@@ -209,6 +218,7 @@ export {
   onUserInRoomUpdate,
   onAllTextsReceived,
   onTextReceived,
+  onUsersReceived,
   createRoom,
   postTextToRoom,
   onRoomDataReceived,
@@ -217,6 +227,7 @@ export {
   removeSelfFromConnectedRoom,
   onUserDisconnect,
   userSignOut,
-  getOrAddPresenceRef,
+  initializeUser,
+  _updateProfile as updateProfile,
   auth
 };

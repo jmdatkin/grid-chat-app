@@ -6,10 +6,12 @@ import { UserContext, RoomContext } from "../App";
 import { Tooltip } from "react-tooltip";
 import LoginForm from "./LoginForm";
 import { User, signOut } from "firebase/auth";
-import { auth, userSignOut } from "../firebase";
+import { auth, onUserEnterRoom, userSignOut } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation } from "react-router-dom";
 import Avatar from "./Avatar";
+import { usePrevious } from "react-use";
+import { DataSnapshot } from "firebase/database";
 
 type SidebarProps = {
     sidebarHidden: boolean,
@@ -45,12 +47,12 @@ function Sidebar(props: SidebarProps) {
         }
     }, [user?.displayName]);
 
+    const previousRoom = usePrevious(room);
+
     const usersList = function () {
-        if (room && room.connected) {
-            return Object.values(room.connected).map((user: any) => {
-                // console.log(user);
-                return (<span>{user.displayName || user.uid}</span>);
-                // return (<span>{user.displayName}</span>);
+        if (room && room.users) {
+            return Object.values(room.users).map((user: any, index: number) => {
+                return (<span key={index}>{user.displayName || user.uid.substring(0, 8)}</span>);
             });
         }
         return '';
@@ -62,26 +64,20 @@ function Sidebar(props: SidebarProps) {
                 <div className="flex justify-between items-center w-full p-2 pl-4">
                     <div className="flex flex-col">
                         <span className="font-bold text-lg">{room !== null ? room!.name : 'Public'}</span>
-                        {/* <span>
-                        <span className="font-bold font-mono text-zinc-600 tracking-tight text-sm text-ellipsis">Owner</span>
-                        <span className="font-mono">{room !== null ? room!.owner : 'Public'}</span>
-                        </span> */}
+
                     </div>
                     <div className="flex">
-                        {/* <IconButton style={{ color: 'white' }} icon={faRightFromBracket} clickHandler={signOutHandler}></IconButton>
-                        <IconButton label="Testing" style={{ color: 'white' }} icon={faTimes} clickHandler={() => props.setSidebarHidden(true)}></IconButton> */}
                         <IconButton icon={faRightFromBracket} clickHandler={signOutHandler}></IconButton>
                         <IconButton icon={faTimes} clickHandler={() => props.setSidebarHidden(true)}></IconButton>
                     </div>
                 </div>
                 <div className="SidebarInfo flex flex-col">
-                    {/* <span>Signed in as: <strong>{user?.isAnonymous ? 'anonymous' : user?.email}</strong></span> */}
                 </div>
             </div>
             <div className="SidebarSectionBody flex-grow">
                 <section className="border-b p-4">
-                    <div className="w-full text-dark text-sm font-semibold">
-                        <span>In Room</span>
+                    <div className="w-full text-dark text-sm">
+                        <div className="font-bold mb-2">In Room</div>
                         <div className="flex flex-col">
                             {usersList()}
                         </div>
@@ -90,7 +86,6 @@ function Sidebar(props: SidebarProps) {
             </div>
             <div className="SidebarSectionFooter h-14 bg-zinc-800 w-full p-2 px-4 flex justify-between items-center">
                 <div className="text-zinc-50 space-x-2 flex items-center">
-                    {/* <FontAwesomeIcon className="" icon={faUser}></FontAwesomeIcon> */}
                     <Avatar onClick={() => props.setDialogModalOpen(true)}></Avatar>
                     <span>{userString}</span>
                 </div>
